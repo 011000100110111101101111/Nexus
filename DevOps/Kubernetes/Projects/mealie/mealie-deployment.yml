@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mealie-deployment
+  labels:
+    lab: mealie
+  namespace: homelab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      lab: mealie
+  template:
+    metadata:
+      labels:
+        lab: mealie
+    spec:
+      containers:
+      - name: mealie
+        image: ghcr.io/mealie-recipes/mealie:v1.0.0-RC1.1
+        env:
+          - name: TZ
+            value: "US/Eastern"
+          - name: ALLOW_SIGNUP
+            value: "True"
+          - name: PUID
+            value: "1000"
+          - name: PGID
+            value: "1000"
+          - name: MAX_WORKERS
+            value: "1"
+          - name: WEB_CONCURRENCY
+            value: "1"
+          - name: BASE_URL
+            value: "https://mealie.nexus-core.dev"
+        volumeMounts:
+        - name: data 
+          mountPath: "/app/data"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mealie-data-longhorn-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mealie-service
+  labels:
+    lab: mealie
+  namespace: homelab
+spec:
+  selector:
+    lab: mealie
+  ports:
+  - name: ui
+    port: 9925
+    protocol: TCP
+    targetPort: 9000
+  type: LoadBalancer

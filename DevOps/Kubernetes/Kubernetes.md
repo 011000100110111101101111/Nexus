@@ -953,6 +953,26 @@ In the above example, notice the 3 - next to podSelector, namespaceSelector, and
 
 In thios above example, notice it is now only 2, and namespaceSelector is part of the podSelector array. In this scenario, the traffic must match the api-pod label AND be in the prod envirement, OR be coming from the ipBlock range.
 
+##### RBAC
+
+###### Role
+
+Roles can be created list rules for access to resources in a cluster. These rules refer to three things, the apigroup, the resources, and the verbs. For example, if you wanted to allow a user to run the command kubectl get pods, you could add pods to resources, and get to verbs.
+
+These roles are namespace dependent!!
+
+Helpful command for checking your permissions.
+
+```bash
+kubectl auth can-i create deployments --as dev-user --namespace test
+```
+
+You can also specify certain pods within a namespace if you do not want to give access to everything. You just need to include the name of the pods in resourceNames: [""]
+
+###### RoleBinding
+
+Similiar to the process of creating cluster contexts for users, you must link the user to the role for it to take effect. This is the simple function of the rolebinding. 
+
 ## Configuration Files
 
 ### YAML
@@ -967,50 +987,52 @@ In thios above example, notice it is now only 2, and namespaceSelector is part o
 
 ##### Node Affinity
 
-    apiVersion: 
-    kind:
+```yaml
+apiVersion: 
+kind:
 
-    metadata:
-      name: my-pod 
-    spec:
-      containers:
-        - name: test 
-          image: nginx
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: size
-                operator: In 
-                values:
-                - Large 
+metadata:
+  name: my-pod 
+spec:
+  containers:
+    - name: test 
+      image: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: size
+            operator: In 
+            values:
+            - Large 
 
- 
+```
 
-    apiVersion: 
-    kind:
+```yaml
+apiVersion: 
+kind:
 
-    metadata:
-      name: my-pod 
-    spec:
-      containers:
-        - name: test 
-          image: nginx
-
+metadata:
+  name: my-pod 
+spec:
+  containers:
+    - name: test 
+      image: nginx
+```
 This is just our normal pod declaration
-
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-          - matchExpressions:
-            - key: size
-              operator: In 
-              values:
-              - Large
-              - small
-
+```yaml
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: size
+          operator: In 
+          values:
+          - Large
+          - small
+```
 - `affinity` is our attribute
 - `nodeAffinity` we are referring to nodes affinity 
 - `requiredDuringSchedulingIgnoredDuringExecution` 
@@ -1024,73 +1046,76 @@ This is just our normal pod declaration
 
 You can also only check for the key with 
 
-    ...
-    - key: size 
-      operator: Exists
-
+```yaml
+...
+- key: size 
+  operator: Exists
+```
 
     
 ##### Full Deployment 
 
-    apiVersion: apps/v1
-    kind: Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo
+spec:
+  replicas: 3 # Deploy 3
+  selector:
+    matchLabels:
+      app: mongo
+  template:
     metadata:
-      name: mongo-deployment
       labels:
         app: mongo
     spec:
-      replicas: 3 # Deploy 3
-      selector:
-        matchLabels:
-          app: mongo
-      template:
-        metadata:
-          labels:
-            app: mongo
-        spec:
-          containers:
-          - name: mongodb
-            image: mongo:7.0 
-            ports:
-            - containerPort: 27017 # Reference the docker image for this. Look for "Connect to x from another docker container" 
-          env:
-          - name: MONGO_INITDB_ROOT_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: dotfile-secret  
-                key: username 
-          - name: MONGO_INITDB_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: dotfile-secret 
-                key: password
+      containers:
+      - name: mongodb
+        image: mongo:7.0 
+        ports:
+        - containerPort: 27017 # Reference the docker image for this. Look for "Connect to x from another docker container" 
+      env:
+      - name: MONGO_INITDB_ROOT_USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: dotfile-secret  
+            key: username 
+      - name: MONGO_INITDB_ROOT_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: dotfile-secret 
+            key: password
 
 
-    ---
-    # Service, --- is yaml seperator
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: mongo-service 
-    spec: 
-      selector: 
-        app.kubernetes.io/name: mongo
-      ports:
-        - protocol: TCP
-          port: 8080 
-          targetPort: 27017
-
+---
+# Service, --- is yaml seperator
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service 
+spec: 
+  selector: 
+    app.kubernetes.io/name: mongo
+  ports:
+    - protocol: TCP
+      port: 8080 
+      targetPort: 27017
+```
 
 
 Lets break this up. 
 
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: mongo-deployment
-      labels:
-        app: mongo
-
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo
+```
 - The `apiVersion` will be supplied when you check on Kubernetes docs.
 - The `kind` is a Deployment, remember above we stated deployments are for making blueprints of a pod, allowing you to deploy more than 1.
 - The `metadata` is a required part. 
@@ -1098,13 +1123,13 @@ Lets break this up.
 - The `labels` here are optional.
 
 
-
-    spec:
-      replicas: 3 # Deploy 3
-      selector:
-        matchLabels:
-          app: mongo
-
+```yaml
+spec:
+  replicas: 3 # Deploy 3
+  selector:
+    matchLabels:
+      app: mongo
+```
 - `spec` is a required field.
 - `replicas` is saying how many copies of the pod do you want running
 - `selector` is where we can say what pod these settings should apply to
@@ -1112,18 +1137,18 @@ Lets break this up.
   - Important to note. `app: mongo` is a value/key pair. It can be anything, but it is best practice to use app as the id.
 
 
-
-    template: # Blueprint (configuration) for the pods 
-        metadata:
-          labels:
-            app: mongo
-        spec:
-          containers: # Good to only do 1 per pod.
-          - name: mongodb # name of container
-            image: mongo:7.0 # Normal image on docker
-            ports:
-            - containerPort: 27017 # Reference the docker image for this. Look for "Connect to x from another docker container"
-
+```yaml
+template: # Blueprint (configuration) for the pods 
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers: # Good to only do 1 per pod.
+      - name: mongodb # name of container
+        image: mongo:7.0 # Normal image on docker
+        ports:
+        - containerPort: 27017 # Reference the docker image for this. Look for "Connect to x from another docker container"
+```
 - `template` is where we configure the blueprint for the pods.
 - `metadata` required field. Keep in mind, we are now configuring the POD, not the deployment itself.
 - `labels` is shared across all replicas of the pod. It is what gets matched against the above check and 
@@ -1138,17 +1163,19 @@ is also checked for the service access.
 
 BUT WAIT..HOW DO I LOAD ENV VARIABLES LISTED ON DOCKER HUB??
 
-          env:
-          - name: MONGO_INITDB_ROOT_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: dotfile-secret  
-                key: username 
-          - name: MONGO_INITDB_ROOT_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: dotfile-secret 
-                key: password
+```yaml
+env:
+- name: MONGO_INITDB_ROOT_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: dotfile-secret  
+      key: username 
+- name: MONGO_INITDB_ROOT_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: dotfile-secret 
+      key: password
+```
 
 - `env` is a section for loading environment variables.
 - `name` name of the variable you wish to load, normally on dockerhub page.
@@ -1158,25 +1185,27 @@ BUT WAIT..HOW DO I LOAD ENV VARIABLES LISTED ON DOCKER HUB??
 - For the next two, lets reference a `mongo-secret.yaml` file (secrets file) we created.
 - `name` references the `metadata` name below
 - `key` references which `data` attribute we are referencing below..
- 
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: dotfile-secret
-      data:
-        username: bW9uZ291c2Vy
-        password: bW9uZ29wYXNz
 
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dotfile-secret
+data:
+  username: bW9uZ291c2Vy
+  password: bW9uZ29wYXNz
+```
 
 
 
 This is the service parts.
 
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: mongo-service
-
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+```
 - `apiVersion` again, pulled off kubernetes docs.
 - `kind` This is a service. Remember, services are used to assign permanent addresses to pods,
 and act as load balancers.
@@ -1184,15 +1213,15 @@ and act as load balancers.
 - `name` name of service, endpoint used for access. Defined in our `mongo-config.yaml` under `mongo-url`. Must be same.
 
 
-
-    spec:
-      selector:
-        app.kubernetes.io/name: mongo
-      ports:
-        - protocol: TCP
-          port: 8080
-          targetPort: 27017
-
+```yaml
+spec:
+  selector:
+    app.kubernetes.io/name: mongo
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 27017
+```
 - `spec` required, this is for a service though, so its slightly different.
 - `selector` Select the pods to forward requests to 
 - `app.kubernetes.io/name` **Common name** of pods to forward to , should match template labels
@@ -1206,16 +1235,17 @@ the application within the pod via this port.
  
 The above is for an `INTERNAL SERVICE`. If you want an `EXTERNAL SERVICE` you need to add the elemnts below,
 
-    spec:
-      type: NodePort
-      selector:
-        app.kubernetes.io/name: mongo
-      ports:
-        - protocol: TCP
-          port: 8080
-          targetPort: 27017
-          nodePort: 32000
-
+```yaml
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: mongo
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 27017
+      nodePort: 32000
+```
 - `type` Is the service type. By default it is set to `ClusterIP` which represents an internal service. An external service 
 is represented by `NodePort`. 
 - `nodePort` Opens a port on the nodes IP `NodeIP:NodePort`
@@ -1224,12 +1254,74 @@ is represented by `NodePort`.
 
 
 #### Pod Example
-    
-    apiVersion: v1 
-    kind: Pod
+
+```yaml
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: myapp-pod
+  namespace: dev 
+  labels:
+    app: myapp
+    type: front-end
+spec:
+  containers:
+  - name: nginx-controller
+    image: nginx
+```
+This is the pods that would be deployed
+
+```bash
+NAME             READY   STATUS    RESTARTS   AGE 
+nginx            1/1     Running   0          45m
+```
+#### ReplicationController Example
+```yaml
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myapp-rc
+  labels:
+    # key: value
+    app: myapp
+    type: front-end
+spec: 
+  template:
+    # Can pull from our created pod.yaml above. Everything below kind:
     metadata:
       name: myapp-pod
-      namespace: dev 
+      labels:
+        app: myapp
+        type: front-end
+    spec:
+      containers:
+      - name: nginx-controller
+        image: nginx 
+  replicas: 3
+```
+This is the pods that would be deployed.
+```bash
+NAME             READY   STATUS    RESTARTS   AGE
+myapp-rc-6d44f   1/1     Running   0          11s
+myapp-rc-jb7b6   1/1     Running   0          11s
+myapp-rc-mqv2s   1/1     Running   0          11s
+```
+#### ReplicaSet Example
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+name: myapp-replicaset
+labels:
+  # key: value 
+  app: myapp
+  type: front-end
+spec:
+  template:
+    # Can pull from our created pod.yaml. Everytrhing below metadata:
+    metadata:
+      name: myapp-pod
       labels:
         app: myapp
         type: front-end
@@ -1238,215 +1330,168 @@ is represented by `NodePort`.
       - name: nginx-controller
         image: nginx
 
-This is the pods that would be deployed
-
-    NAME             READY   STATUS    RESTARTS   AGE 
-    nginx            1/1     Running   0          45m
-
-#### ReplicationController Example
-
-    apiVersion: v1
-    kind: ReplicationController
-    metadata:
-      name: myapp-rc
-      labels:
-        # key: value
-        app: myapp
-        type: front-end
-    spec: 
-      template:
-        # Can pull from our created pod.yaml above. Everything below kind:
-        metadata:
-          name: myapp-pod
-          labels:
-            app: myapp
-            type: front-end
-        spec:
-          containers:
-          - name: nginx-controller
-            image: nginx 
-      replicas: 3
-
-This is the pods that would be deployed.
-
-    NAME             READY   STATUS    RESTARTS   AGE
-    myapp-rc-6d44f   1/1     Running   0          11s
-    myapp-rc-jb7b6   1/1     Running   0          11s
-    myapp-rc-mqv2s   1/1     Running   0          11s
-
-#### ReplicaSet Example
-
-    apiVersion: apps/v1
-    kind: ReplicaSet
-    metadata:
-    name: myapp-replicaset
-    labels:
-      # key: value 
-      app: myapp
+  replicas: 3
+  selector:
+    matchLabels:
+      # key: value
       type: front-end
-    spec:
-      template:
-        # Can pull from our created pod.yaml. Everytrhing below metadata:
-        metadata:
-          name: myapp-pod
-          labels:
-            app: myapp
-            type: front-end
-        spec:
-          containers:
-          - name: nginx-controller
-            image: nginx
-
-      replicas: 3
-      selector:
-        matchLabels:
-          # key: value
-          type: front-end
-
+```
 This is the pods that would be deployed.
 
-    NAME                     READY   STATUS    RESTARTS   AGE
-    myapp-replicaset-5whw4   1/1     Running   0          70s
-    myapp-replicaset-qzp9k   1/1     Running   0          70s
-    myapp-replicaset-xq6vg   1/1     Running   0          70s
-
+```bash
+NAME                     READY   STATUS    RESTARTS   AGE
+myapp-replicaset-5whw4   1/1     Running   0          70s
+myapp-replicaset-qzp9k   1/1     Running   0          70s
+myapp-replicaset-xq6vg   1/1     Running   0          70s
+```
 #### Deployment Example
 
-    apiVersion: apps/v1
-    kind: Deployment
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: myapp-replicaset
+labels:
+  # key: value 
+  app: myapp
+  type: front-end
+spec:
+  template:
+    # Can pull from our created pod.yaml. Everytrhing below metadata:
     metadata:
-    name: myapp-replicaset
-    labels:
-      # key: value 
-      app: myapp
-      type: front-end
+      name: myapp-pod
+      labels:
+        app: myapp
+        type: front-end
     spec:
-      template:
-        # Can pull from our created pod.yaml. Everytrhing below metadata:
-        metadata:
-          name: myapp-pod
-          labels:
-            app: myapp
-            type: front-end
-        spec:
-          containers:
-          - name: nginx-controller
-            image: nginx
+      containers:
+      - name: nginx-controller
+        image: nginx
 
-      replicas: 3
-      selector:
-        matchLabels:
-          # key: value
-          type: front-end
+  replicas: 3
+  selector:
+    matchLabels:
+      # key: value
+      type: front-end
+
+```
 
 This is the pods that would be deployed.
 
-    NAME                     READY   STATUS    RESTARTS   AGE
-    myapp-replicaset-5whw4   1/1     Running   0          70s
-    myapp-replicaset-qzp9k   1/1     Running   0          70s
-    myapp-replicaset-xq6vg   1/1     Running   0          70s
+```bash
+NAME                     READY   STATUS    RESTARTS   AGE
+myapp-replicaset-5whw4   1/1     Running   0          70s
+myapp-replicaset-qzp9k   1/1     Running   0          70s
+myapp-replicaset-xq6vg   1/1     Running   0          70s
+```
 
 #### Service -> NodePort Example
 
-    apiVersion: v1 
-    kind: Service
-    metadata:
-      name: myapp-service
-    spec:
-      type: NodePort
-      ports:
-      - targetPort: 80 
-        port: 80 
-        nodePort: 30008
-      selector:
-        app: myapp 
-        type: front-end
-
+```yaml
+apiVersion: v1 
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  type: NodePort
+  ports:
+  - targetPort: 80 
+    port: 80 
+    nodePort: 30008
+  selector:
+    app: myapp 
+    type: front-end
+``` 
 For reference, the selector params are taken from these spots in a pod declaration.
+```yaml
+apiVersion: v1 
+kind: Pod
+metadata:
+  name: myapp-pod
+  labels:
+    app: myapp        << HERE
+    type: front-end   << HERE
+spec:
+  containers:
+  - name: nginx-controller
+    image: nginx
+```
 
-    apiVersion: v1 
+#### Service -> ClusterIP Example
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-end
+spec:
+  type: ClusterIP
+  ports:
+  - targetPort: 80 
+    port: 80 
+  selector:
+    app: myapp 
+    type: back-end
+```
+#### Labels & Selectors & Annotations Example
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+...
+  annotations:
+    buildversion: 1.34 
+spec:
+  replicas: 3 
+  selector:
+    matchLabels: 
+      app: App1
+      function: front-end
+  template:
+    metadata:
+      labels:
+        app: App1
+        function: front-end
+    spec:
+      containers:
+      - name: simple-webapp
+        image: nginx 
+```
+#### Taint & Tolerations example
+
+```yaml
+apiVersion: v1 
     kind: Pod
     metadata:
       name: myapp-pod
       labels:
-        app: myapp        << HERE
-        type: front-end   << HERE
+        app: myapp
+        type: front-end
     spec:
       containers:
       - name: nginx-controller
-        image: nginx
+        image: nginx  
+      tolerations:
+      - key: "app" 
+        operator: "Equal"
+        value: "blue" 
+        effect: "NoSchedule"
+```
 
-
-#### Service -> ClusterIP Example
-
-    apiVersion: v1
-    kind: Service
-    metadata:
-      name: back-end
-    spec:
-      type: ClusterIP
-      ports:
-      - targetPort: 80 
-        port: 80 
-      selector:
-        app: myapp 
-        type: back-end
-
-#### Labels & Selectors & Annotations Example
-
-    apiVersion: apps/v1
-    kind: ReplicaSet
-    metadata:
-    ...
-      annotations:
-        buildversion: 1.34 
-    spec:
-      replicas: 3 
-      selector:
-        matchLabels: 
-          app: App1
-          function: front-end
-      template:
-        metadata:
-          labels:
-            app: App1
-            function: front-end
-        spec:
-          containers:
-          - name: simple-webapp
-            image: nginx 
-
-#### Taint & Tolerations example
-
-    apiVersion: v1 
-        kind: Pod
-        metadata:
-          name: myapp-pod
-          labels:
-            app: myapp
-            type: front-end
-        spec:
-          containers:
-          - name: nginx-controller
-            image: nginx  
-          tolerations:
-          - key: "app" 
-            operator: "Equal"
-            value: "blue" 
-            effect: "NoSchedule"
-
-This is equivilent to 
-
-    kubectl taint nodes node1 app=blue:NoSchedule
-
+This is equivilent to,
+```bash
+kubectl taint nodes node1 app=blue:NoSchedule
+```
 
 #### Namespace
 
-    apiVersion: v1 
-    kind: Namespace 
-    metadata:
-      name: dev 
-
+```yaml
+apiVersion: v1 
+kind: Namespace 
+metadata:
+  name: dev 
+```
 #### ResourceQuota
  
  ```yaml
@@ -1546,40 +1591,83 @@ spec:
 #### Resource Quota
 
 
+#### Role 
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: developer
+  # Optional
+  namespace: dev
+rules:
+  # Can view pods, Can create Pods, Can Delete Pods
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list", "get", "create", "update", "delete"]
+  # Specifying only specific pods inside a namespace
+  resourceNames: ["blue", "red"]
+  # Can create configMaps
+- apiGroups: [""]
+  resources: ["configMap"]
+  verbs: ["create"]
+```
+
+#### RoleBinding
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devuser-developer-binding
+# Links user dev-user to the role developer
+subjects:
+- kind: User
+  name: dev-user
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: developer
+  apiGroup: rbac.authorization.k8s.io
+```
+
+
 
 #### Persistent Volume (PV)
 
-    apiVersion: v1
-    kind: PersistentVolume
-    metadata:
-      name: nfs-main-volume
-      labels:
-        type: local
-    spec:
-      persistentVolumeReclaimPolicy: Retain
-      claimRef:
-        name: nfs-main-claim
-      storageClassName: manual
-      capacity:
-        storage: 200Mi
-      accessModes:
-        - ReadWriteMany
-      hostPath:
-        path: "/data/nfs"
-
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-main-volume
+  labels:
+    type: local
+spec:
+  persistentVolumeReclaimPolicy: Retain
+  claimRef:
+    name: nfs-main-claim
+  storageClassName: manual
+  capacity:
+    storage: 200Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/data/nfs"
+```
 #### Persistent Volume Claim (PVC)
 
-    kind: PersistentVolumeClaim
-    apiVersion: v1
-    metadata:
-      name: claim-log-1
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 50Mi
-
+```yaml
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: claim-log-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+```
 ### Update configuration / Rollout Control
 
 
@@ -2551,25 +2639,3 @@ Some important issues I ran into.
   - Advanced Options, Mapall User -> root , Mapall Group -> root
 - This implementation is EXTREMELY insecure currently, only would be viable with proper firewalling / in a homelab.
   - However, this share is also not storing any sensitive data.
-
-
-TODO Deploy postgressql-ha
-### Deploy Postgressql
-
-#### In HA Mode
-
-#### Normally
-
-
-TODO Deploy gitlab
-### Deploy gitlab
-
-
-
-TODO Deploy semaphore
-### Deploy semaphore
-
-Will most likely depend on postgressql
-
-[here](https://docs.semui.co/)
-

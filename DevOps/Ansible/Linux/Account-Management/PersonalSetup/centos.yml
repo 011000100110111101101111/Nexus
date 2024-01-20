@@ -1,0 +1,16 @@
+- name: Install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ package_list_all }}"
+
+- name: Install centos specific packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ specific_package_list_centos }}"
+
+#- name: Loop through manual installations
+#  command:
+#    cmd: "{{ item }}"
+#  loop: "{{ manual_installations }}"
