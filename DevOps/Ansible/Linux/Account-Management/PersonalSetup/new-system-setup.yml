@@ -1,5 +1,5 @@
 # Usage
-# This script will copy your public key and enforce PubkeyAuthentication by disabling password authentication 
+# This script will copy your public key and enforce PubkeyAuthentication by disabling password authentication
 # and ensuring pubkeyauthentication is enabled
 
 # Instructions
@@ -12,10 +12,10 @@
 
   # Global vars, change here
   vars:
-    current_user_name: "alex"
+    current_user_name: "ubuntu"
     ssh_password_authentication: "no"
     ssh_permit_empty_passwords: "no"
-    ssh_use_pam: "no"
+    ssh_use_pam: "yes"
     ssh_permit_root_login: "no"
     ssh_pubkey_authentication: "yes"
     ssh_port: "22"
@@ -24,16 +24,17 @@
       - git
       - wget
       - vim
+      - zoxide
+      - thefuck
     specific_package_list_ubuntu:
-      - zsh
+      - git
     specific_package_list_centos:
-      - zsh
-    #manual_installations:
+      - git
 
   tasks:
     - name: Copy SSH public key
       authorized_key:
-        user: "alex"
+        user: "{{current_user_name}}"
         key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
         state: present
 
@@ -41,7 +42,7 @@
       lineinfile:
         path: /etc/ssh/sshd_config
         state: absent
-        regexp: '.*'
+        regexp: ".*"
 
     - name: Configure sshd_config
       blockinfile:
@@ -172,78 +173,87 @@
       notify:
         - Restart SSH
 
-    - name: Performing Initial Boot for Ubuntu 
+    - name: Configure known_hosts
+      blockinfile:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.ssh/authorized_keys
+        backup: yes
+        block: |
+          # Trusted keys :D
+          # Mobile
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINs8KbefMC7eYXEXL2sQPKJ4gkh/+hB6vzuNISw5zgFn
+          # Stationary
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOBwEfY4oFR0gc5aqdWWhWJq+0x+9qA1m4sRW+lOgE3B
+          # WSL
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBembU+l9izOhhWP7GXol+yLWkquFVilpCI5pfdbwuC9
+
+    - name: Performing Initial Boot for Ubuntu
       include_tasks: ubuntu.yml
       when: ansible_facts['distribution'] == 'Ubuntu'
 
-    - name: Performing Initial Boot for Centos 
+    - name: Performing Initial Boot for Centos
       include_tasks: centos.yml
       when: ansible_facts['distribution'] == 'Centos'
 
-### SHELL SETUP (OHMYZSH)
+    ### SHELL SETUP (OHMYZSH)
 
     # - name: Check if .zshrc exists
     #   stat:
     #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc
     #   register: stat_rc_result
 
-    # - name: Check if .oh-my-zsh exists
-    #   stat:
-    #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh
-    #   register: stat_oh_my_zsh_result
+    - name: Check if .oh-my-zsh exists
+      stat:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh
+      register: stat_oh_my_zsh_result
 
-    # - name: Check if zsh-autocomplete exists
-    #   stat:
-    #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-autocomplete
-    #   register: stat_zsh_autocomplete_result
+    - name: Check if zsh-autocomplete exists
+      stat:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-autocomplete
+      register: stat_zsh_autocomplete_result
 
-    # - name: Check if zsh-spaceship exists
-    #   stat:
-    #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt
-    #   register: stat_zsh_spaceship_prompt_result
+    - name: Check if zsh-spaceship exists
+      stat:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt
+      register: stat_zsh_spaceship_prompt_result
 
-    # - name: Check if zsh-syntaxhighlighting exists
-    #   stat:
-    #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-    #   register: stat_zsh_syntaxhighlighting_result
+    - name: Check if zsh-syntaxhighlighting exists
+      stat:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+      register: stat_zsh_syntaxhighlighting_result
 
-    # - name: Cloning oh-my-zsh
-    #   git:
-    #     repo=https://github.com/robbyrussell/oh-my-zsh
-    #     dest=/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh
-    #   when: not stat_oh_my_zsh_result.stat.exists
+    - name: Cloning oh-my-zsh
+      git: repo=https://github.com/robbyrussell/oh-my-zsh
+        dest=/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh
+      when: not stat_oh_my_zsh_result.stat.exists
 
-    # - name: Cloning zsh-autocomplete
-    #   command:
-    #     cmd: 'git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-autocomplete"'
-    #   when: not stat_zsh_autocomplete_result.stat.exists
+    - name: Cloning zsh-autocomplete
+      command:
+        cmd: 'git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-autocomplete"'
+      when: not stat_zsh_autocomplete_result.stat.exists
 
-    # - name: Cloning zsh-autocomplete
-    #   command:
-    #     cmd: 'git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"'
-    #   when: not stat_zsh_syntaxhighlighting_result.stat.exists
+    - name: Cloning zsh-autocomplete
+      command:
+        cmd: 'git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting"'
+      when: not stat_zsh_syntaxhighlighting_result.stat.exists
 
-    # - name: Cloning spaceship prompt
-    #   command:
-    #     cmd: "{{ item  }}"
-    #   loop:
-    #     - 'git clone https://github.com/spaceship-prompt/spaceship-prompt.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt" --depth=1'
-    #     - 'ln -s "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt/spaceship.zsh-theme" "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship.zsh-theme"'
-    #   when: not stat_zsh_spaceship_prompt_result.stat.exists
+    - name: Cloning spaceship prompt
+      command:
+        cmd: "{{ item  }}"
+      loop:
+        - 'git clone https://github.com/spaceship-prompt/spaceship-prompt.git "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt" --depth=1'
+        - 'ln -s "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt/spaceship.zsh-theme" "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship.zsh-theme"'
+      when: not stat_zsh_spaceship_prompt_result.stat.exists
 
-    # - name: Creating new ~/.zshrc
-    #   copy:
-    #     src: ".zshrc"
-    #     dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
-    #   when: not stat_rc_result.stat.exists
+    - name: Creating new ~/.zshrc
+      copy:
+        src: ".zshrc"
+        dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
+        backup: "yes"
+      #when: not stat_rc_result.stat.exists
 
-    # #- name: Setting zsh as new shell
-    # #  command:
-    # #    cmd: chsh -s "$(which zsh)"
-
-    # - name: Set login shell of user {{ current_user_name | default(ansible_env.USER) }} to `/bin/zsh` with `usermod`
-    #   command: 
-    #     cmd: usermod --shell /bin/zsh {{ current_user_name | default(ansible_env.USER) }}
+    - name: Set login shell of user {{ current_user_name | default(ansible_env.USER) }} to `/bin/zsh` with `usermod`
+      command:
+        cmd: usermod --shell /bin/zsh {{ current_user_name | default(ansible_env.USER) }}
 
     #- name: Install Dependencies
 

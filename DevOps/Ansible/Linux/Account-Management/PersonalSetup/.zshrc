@@ -70,7 +70,19 @@ ZSH_THEME="spaceship"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-completions zsh-syntax-highlighting zsh-autosuggestions)
+plugins=( \
+git zsh-autocomplete zsh-syntax-highlighting \
+kubectl aliases ansible \
+colored-man-pages colorize command-not-found \
+docker docker-compose emoji-clock \
+firewalld git git-prompt \
+helm history last-working-dir \
+lxd nmap podman \
+ripgrep systemd thefuck \
+themes timer transfer \
+ufw vault web-search \
+vscode zsh-interactive-cd zoxide \
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -100,6 +112,7 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+eval $(thefuck --alias redo)
 
 alias automation="ssh alex@10.35.40.55"
 alias k8-master-1="ssh alex@10.35.40.60"

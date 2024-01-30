@@ -3,9 +3,43 @@ global:
   tlsDisable: false
 injector:
   enabled: true
+  logLevel: "error"
+  logFormat: "json"
+  securityContext:
+    pod:
+      runAsNonRoot: true
+      runAsGroup: 1000
+      runAsUser: 100
+      fsGroup: 1000
+    container:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+  resources:
+    requests:
+      memory: '256Mi'
+      cpu: '250m'
+    limits:
+      memory: '256Mi'
+      cpu: '250m'
+  # affinity: |
+  #   podAntiAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #         matchLabels:
+  #           app.kubernetes.io/name: {{ template "vault.name" . }}-agent-injector
+  #           app.kubernetes.io/instance: "{{ .Release.Name }}"
+  #           component: webhook
+  #       topologyKey: kubernetes.io/hostname
 server:
+  resources:
+    requests:
+      memory: '4Gi'
+    limits:
+      memory: '4Gi'
   dataStorage:
-    enabled: true 
+    enabled: true
     size: 4Gi
     mountPath: "/vault/data"
     storageClass: longhorn
@@ -25,7 +59,15 @@ server:
       readOnly: true
   standalone:
     enabled: false
-  affinity: ""
+  # affinity: |
+  #   podAntiAffinity:
+  #     requiredDuringSchedulingIgnoredDuringExecution:
+  #     - labelSelector:
+  #       matchLabels:
+  #         app.kubernetes.io/name: {{ template "vault.name" . }}
+  #         app.kubernetes.io/instance: "{{ .Release.Name }}"
+  #         component: server
+  #       topologyKey: kubernetes.io/hostname
   ha:
     enabled: true
     replicas: 2
@@ -43,7 +85,7 @@ server:
               tls_client_ca_file = "/vault/userconfig/vault-ha-tls/vault.ca"
               # For prometheous operator access
               unauthenticated_metrics_access = "true"
-        
+
           }
           storage "raft" {
               path = "/vault/data"
@@ -81,4 +123,4 @@ serverTelemetry:
 ui:
   enabled: true
   serviceType: "LoadBalancer"
-  loadBalancerIP: 10.35.40.122
+  #loadBalancerIP: 10.35.40.122

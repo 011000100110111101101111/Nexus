@@ -2514,24 +2514,26 @@ First edit web-app-deployment.yml and remove the line,
 
 Then, create a file called web-app-ingress.yml and add the following
 
-    apiVersion: networking.k8s.io/v1
-    kind: Ingress
-    metadata:
-      name: web-app
-      annotations:
-        kubernetes.io/ingress.class: "nginx"
-    spec:
-      rules:
-      - host: web-app.home-k8s.lab
-        http:
-          paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: web-app
-                port:
-                  number: 80
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: web-app.home-k8s.lab
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-app
+            port:
+              number: 80
+```
 
 Apply this,
 

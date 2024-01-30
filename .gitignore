@@ -1,1 +1,4 @@
 hosts.ini
+*.cert
+*.key
+*.crt
