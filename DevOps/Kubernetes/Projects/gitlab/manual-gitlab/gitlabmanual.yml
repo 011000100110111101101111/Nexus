@@ -15,19 +15,17 @@ spec:
       labels:
         app: gitlab
     spec:
+      #hostname: "gitlab.ccdc.edu"
       containers:
       - name: gitlab
         image: gitlab/gitlab-ce:latest
-        env:
-          - name: hostname
-            value: "gitlab.cyber.uml.edu"
         resources:
           requests:
-            memory: "4Gi"
-            cpu: "2"
+            memory: "3Gi"
+            cpu: "800m"
           limits:
-            memory: "4Gi"
-            cpu: "2"
+            memory: "3Gi"
+            cpu: "800m"
         volumeMounts:
         - name: etc
           mountPath: "/etc/gitlab"

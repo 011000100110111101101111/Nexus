@@ -10,7 +10,7 @@
   - 192.168.3.210
 - k8-worker-2
   - 192.168.3.211
-- k8-worker-3
+- k8-nfs-share
   - 192.168.3.212
 
 [network]
@@ -33,44 +33,11 @@
 
 ## Deployed Applications
 
-- Vault
-  - http://192.168.3.220:8200/ui/vault/dashboard
+- Gitlab
+  - http://192.168.3.221:8080
+  - Also, 22, and 443
+- postgressql
+  - Internal, 5432
+- HAProxy Ingress
+  - 80, 443, 5432
 
-
-## TODO
-
-### Deployments
-- ~~postgressql-ha~~
-- ~~Deploy Gitlab + Redis backend~~
-- ~~Gitlab webservice~~
-- ~~Deploy Vault~~
-- ~~Deploy Prometheus and Grafana~~
-- Deploy Semaphore
-
-### Integrations
-- Cert-manager pull certs from Vault acting as CA
-- Integrate Vault with #everything
-- Semaphore CI/CD with Gitlab
-
-### General 
-- Securing the cluster etc
-- Monitoring Solution (Ports, new stuff changed, etc)
-- Handling Migrations
-
-### Side info from packets
-
-**Needed**
-
-- ~~Use flannel for CNI~~
-- ~~Need some storage provisioning, preferebly NFS as we need to be able to make pvc claims for databases.~~
-
-
-**Potential**
-
-- HAProxy
-- Nginx
-- GitLab
-- PostgreSQL
-- Semaphore
-- Nextcloud
-- vault

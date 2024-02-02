@@ -1,0 +1,12 @@
+controller:
+  hostNetwork: true
+  ingressClassResource:
+    enabled: true
+  kind: DaemonSet
+  tcp:
+    "22": gitlab/gitlab-gitlab-shell:22
+    "5432": database/postgresql-ha-postgresql:5432
+  tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Exists
