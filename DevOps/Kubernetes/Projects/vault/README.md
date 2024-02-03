@@ -242,7 +242,10 @@ server:
 helm install vault hashicorp/vault --namespace vault -f values.yml
 ```
 
-## Unsealing Vault after using one of above methods
+## Next Steps
+
+
+### Unsealing Vault
 
 Now we need to unseal the vault. Whether you have 1 pod or multiple running vault, just choose one. Then run the following command with the chosen pod.
 
@@ -285,6 +288,9 @@ In this case, it says the unseal threshold is 3 keys. So using 3 unique keys fro
 Check that your vault pod is correctly running now, then head over to the UI to log in. It will ask for a token, which is the *Initial Root Token* from above. To find it where it is running, you should check your services and look for whatever IP your loadbalancer gave it (Or whatever method you used)
 
     kubectl get services
+
+### Setting up secret injector #TODO Continue looking into vault sidecar
+
 
 ## Troubleshooting commands
 

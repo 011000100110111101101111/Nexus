@@ -1,0 +1,5 @@
+mongodb:
+  auth:
+    passwords:
+      - rocketchat
+    rootPassword: rocketchatroot
