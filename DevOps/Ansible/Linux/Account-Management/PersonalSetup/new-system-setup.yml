@@ -188,7 +188,7 @@
 
     - name: Configure github
       blockinfile:
-        path: $HOME/{{ current_user_name | default(ansible_env.USER) }}/.gitconfig
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.gitconfig
         backup: yes
         validate: /usr/sbin/sshd -T -f %s
         block: |
