@@ -2,7 +2,7 @@ pgpool:
   adminPassword: password123
 postgresql:
   password: password123
-  replicaCount: 1
+  replicaCount: 3
   repmgrPassword: password123
 volumePermissions:
   enabled: true

@@ -1,0 +1,68 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: kubevirt-smoke-fedora
+spec:
+  running: true
+  template:
+    metadata:
+      annotations:
+        kubevirt.io/keep-launcher-alive-after-failure: "true"
+    spec:
+      nodeSelector:
+        kubevirt.io/schedulable: "true"
+      architecture: amd64
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 1
+        resources:
+          requests:
+            memory: 1G
+        machine:
+          type: q35
+        devices:
+          interfaces:
+          - bridge: {}
+            name: default
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: emptydisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+        features:
+          acpi:
+            enabled: true
+        firmware:
+          uuid: c3ecdb42-282e-44c3-8266-91b99ac91261
+      networks:
+      - name: default
+        pod: {}
+      volumes:
+      - containerDisk:
+          image: kubevirt/fedora-cloud-container-disk-demo:latest
+          imagePullPolicy: Always
+        name: containerdisk
+      - emptyDisk:
+          capacity: 2Gi
+        name: emptydisk
+      - cloudInitNoCloud:
+          userData: |-
+            #cloud-config
+            password: changeme               # password of this VM
+            chpasswd: { expire: False }
+        name: cloudinitdisk

@@ -57,6 +57,9 @@ metadata:
   labels:
     app: pihole
   namespace: homelab
+  # This is to expose service to tailscale directly :D, remove if not using tailscale
+  annotations:
+    tailscale.com/expose: "true"
 spec:
   selector:
     app: pihole

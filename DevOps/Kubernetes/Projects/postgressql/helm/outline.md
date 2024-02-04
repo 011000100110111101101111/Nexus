@@ -16,14 +16,13 @@ Can expose to external via helm chart option or creating a service for it (There
 
 ```bash
 # Installation
-helm install postgres oci://registry-1.docker.io/bitnamicharts/postgresql-ha --version 12.2.0 -f Resources/AfterSeeingInfa/postgres-values.yml
+helm install postgres oci://registry-1.docker.io/bitnamicharts/postgresql-ha --version 12.2.0 -f postgres-values.yml
 
 # Testing Connection
 psql -h <ip> -U <user> -d <database>
 
 # The defaults are the following
 psql -h <ip> -U postgres -d postgres
-
 ```
 
 ## Troubleshooting Commands
