@@ -186,12 +186,11 @@
           # WSL
           ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBembU+l9izOhhWP7GXol+yLWkquFVilpCI5pfdbwuC9
 
-    - name: Configure github
-      blockinfile:
-        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.gitconfig
-        backup: yes
-        validate: /usr/sbin/sshd -T -f %s
-        block: |
+    # TODO Ensure doesnt exist already
+    - name: Creating a file with content
+      copy:
+        dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.gitconfig"
+        content: |
           [user]
                   email = 62304179+011000100110111101101111@users.noreply.github.com
                   name = alex
