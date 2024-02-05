@@ -109,9 +109,9 @@ metadata:
     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     # I needed to add this for it to work
-    #nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
     # Redirect
-    nginx.ingress.kubernetes.io/app-root: /admin
+    #nginx.ingress.kubernetes.io/app-root: /admin
 spec:
   ingressClassName: nginx
   rules:
