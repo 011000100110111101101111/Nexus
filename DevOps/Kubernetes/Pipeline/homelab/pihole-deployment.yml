@@ -23,6 +23,11 @@ spec:
             value: "US/Eastern"
           - name: WEBPASSWORD
             value: password
+          - name: WEBPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pihole-secret
+                key: password
           - name: DNSMASQ_USER
             value: root
           - name: DNS1
