@@ -60,8 +60,6 @@ metadata:
   labels:
     app: pihole
   namespace: homelab
-  annotations:
-    tailscale.com/expose: "true"
 spec:
   selector:
     app: pihole
@@ -80,6 +78,8 @@ metadata:
   labels:
     app: pihole
   namespace: homelab
+  annotations:
+    tailscale.com/expose: "true"
 spec:
   selector:
     app: pihole
@@ -111,7 +111,7 @@ metadata:
     # This is clusterissuer you set up with cert-manager
     cert-manager.io/cluster-issuer: development-issuer
     # Default
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     # I needed to add this for it to work
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
