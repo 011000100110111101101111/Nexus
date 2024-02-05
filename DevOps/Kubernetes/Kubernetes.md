@@ -33,17 +33,17 @@ Disclaimer -> Majority of screenshots sourced from [here](https://www.udemy.com/
 
 #### Control Plane
 
-The master node requires significantly less resources than a worker node, however it is 
+The master node requires significantly less resources than a worker node, however it is
 an extreme single point of failure. You should have more than 1 Master running in a cluster.
 
 This is running on a physical or virtual machine. It includes the following functionality,
 
 - API Server
   - **All communication, between all components, must go through the API server**
-  - Works via exposing `RESTful api` 
-    - You post `YAML (manifests)` configuration files to it via `HTTPS` 
+  - Works via exposing `RESTful api`
+    - You post `YAML (manifests)` configuration files to it via `HTTPS`
       - Which container image, ports to expose, Pod replicas, etc.
-  - Auth flow 
+  - Auth flow
     - Request to API server is subjected to authorization and authentication
     - Config in the YAML file is validated and persisted to the cluster store.
     - Changes are scheduled to the worker nodes.
@@ -51,15 +51,15 @@ This is running on a physical or virtual machine. It includes the following func
     - Kubernetes UI Dashboard
     - API for scripts / automating technologys
     - CLI tools
-- Cluster Store 
+- Cluster Store
   - Only `Stateful` part of control Plane
   - Based on `etcd`
     - A database is a key-value store. (Think of a table)
     - The issue with this, is if you add a column, and not every row has a value for it, you are wasting space.
     - In etcd, instead of 1 large table, every row is instead its own table.
     - You can run etcd by itself on a server, runs on port 2379.
-  - `Single source of truth` for the cluster 
-  - Persistently stores entire configuration and state of the cluster 
+  - `Single source of truth` for the cluster
+  - Persistently stores entire configuration and state of the cluster
   - For `HA` , 3-5 etcd replicas is recommended.
   - Default K8 installs replica of etcd on every `control plane` and auto configures `HA`
   - Uses `RAFT` algorithm to handle multiple writes to single location.
@@ -71,10 +71,10 @@ This is running on a physical or virtual machine. It includes the following func
 - Controller Manager (Kube-Controller-Manager)
   - Keeps track of whats happening in the cluster.
   - Node-Controller
-    - On-Boarding new nodes to the cluster 
+    - On-Boarding new nodes to the cluster
     - Handling when nodes get destroyed / unavailable
-    - Checking the status of nodes 
-    - Node monitor period is every 5 seconds 
+    - Checking the status of nodes
+    - Node monitor period is every 5 seconds
     - Communicates through the kube-apiserver
     - If it receives no response from a node, it waits 40 seconds before marking it unreachable.
       - Waits another 5 mins after marked, then removes the node and deploys the pods on it onto other nodes if they are part of a ReplicaSet
@@ -90,8 +90,7 @@ This is running on a physical or virtual machine. It includes the following func
     - Second stage ranks the remaining filtered nodes on scale of 0-10 by calculating the amount of free resources that would be available on the given node after placing the pod on it. Higher score wins (smaller impact).
   - For example.
 
-
-  - ```mermaid 
+  - ```mermaid
     classDiagram
     Master --> Node1 : 20% used
     Master --> Node2 : 70% used 
@@ -106,8 +105,6 @@ This is running on a physical or virtual machine. It includes the following func
 
 As a general overview of the above functionality, see the below diagrams.
 
-
-
 #### Pod
 
 ![podExample](./Resources/screenshots/podexample.png)
@@ -119,25 +116,26 @@ As a general overview of the above functionality, see the below diagrams.
 
 - Ingress
   - Handles forwarding to services.
-  - If you wanted https://my-app.com instead of http://db-service-ip:port then you 
+  - If you wanted <https://my-app.com> instead of <http://db-service-ip:port> then you
   would set up an Ingress. The request would first go to the ingress, then be forwarded to the service.
-- Service 
+- Service
   - Permanent IP address that can be attached to a pod.
   - Even if pod dies, the service is persistent.
-  - Acts as a load balancer as well 
+  - Acts as a load balancer as well
     - Will send requests to whichever Pod is less busy.
-  - Internal Service 
+  - Internal Service
     - Used when accessing a Pod directly
-    - http://db-service-ip:port
-  - External Service 
-    - Used when accessing a Node 
-    - http://node-ip:port 
+    - <http://db-service-ip:port>
+  - External Service
+    - Used when accessing a Node
+    - <http://node-ip:port>
 
 #### Node
 
 ![nodeExample](./Resources/screenshots/nodeexample.png)
 
 Three major components
+
 - Kubelet (Captain of ship.)
   - Watches `API` server for new work tasks
     - If it cannot complete it, it tells control plane and lets it decide.
@@ -148,10 +146,10 @@ Three major components
   - Pulling and running images.
 - Network Proxy (Kube-proxy)
   - Responsible for local cluster networking.
-  - Ensures each node gets its own unique IP 
-  - implements iptables to handle routing and load-balancing traffic 
+  - Ensures each node gets its own unique IP
+  - implements iptables to handle routing and load-balancing traffic
     - Every time a new service is created, it creates appropriate rules on each node to forward traffic from service to appropriate pod.
-  - You have a web server in one container on node a, and you have a db running in one container in 
+  - You have a web server in one container on node a, and you have a db running in one container in
     node b. The `kube-proxy` handles this communication.
 
 #### Replica Set
@@ -160,7 +158,7 @@ Three major components
 
 - This is the newer version of the **Replication Controller** that is being implemented now.
 - The values explained before for Replication-Controller hold the same here.
-- Uses labels and selectors to understand which pods to monitor. 
+- Uses labels and selectors to understand which pods to monitor.
   - This can be newly created, or already created pods, as long as they match the label.
 - If you were to define 3 replicas in a replica set, and had 3 nodes already existing with a matching label, then it would deploy NO new pods.
 - When scaling pods, always update via the yaml file, and just run replace command to push it.
@@ -172,8 +170,8 @@ Three major components
 - Adds on functionality to our replicasets.
 - Functionality
   - Version Control of Docker Instances
-  - Rolling updates 
-  - Rollbacks 
+  - Rolling updates
+  - Rollbacks
   - Ability to pause and resume environment to change requirements in-between. (underlying app version, resource allocation, etc.)
 
 #### Services
@@ -188,7 +186,7 @@ Key thing to understand. The NodePort service has its own IP within the cluster,
 2. Port: This is the node exposed on the service (virtual server) to communicate with the pod.
 3. NodePort: Used to access the webserver/application externally. (30000 to 32767)
 
-**You would access the service above with the following -> curl http://nodeIP:30008**
+**You would access the service above with the following -> curl <http://nodeIP:30008>**
 
 The only required field in a yaml file is the Port. If you don't provide a TargetPort, it is assumed to be the same as the port. If you dont provide a NodePort, it is given a free port within the valid range automatically.
 
@@ -202,10 +200,9 @@ Its easy. First thing to understand is that when you have the deployment set up,
 
 Okay, now that you understand that, it should be pretty simple to grasp how it works across multiple nodes. The service is deployed across the cluster, so its interacting with all the nodes. All it is doing is searching for that label on the pods, and then deciding the best one to send it to. It is also good to note, it is manually accessible from all the nodes IPS.
 
-
 ![nodeportexample3](./Resources/screenshots/nodeportexample3.png)
 
-##### ClusterIP 
+##### ClusterIP
 
 Kubernetes creates a default ClusterIP service called `kubernetes`.
 
@@ -226,14 +223,13 @@ If you did this on an unsupported platform, it would handle itself the same as a
 - Labels are attached as a key:value pair.
   - These are used to add identifiers to an object.
   - For example, I may add a label to my web server as the following,
-    - function: front-end 
+    - function: front-end
 - Selectors are how we can search through all our labels.
   - From the example above, I could select the following,
-    - function=front-end 
+    - function=front-end
   - Which would give me all my front-end objects.
 - Annotations are just that, they are way to add some extra information.
   - For example, I may add that the current buildVersion is 1.3.
-
 
 #### Taints and Tolerations
 
@@ -247,7 +243,6 @@ If you did this on an unsupported platform, it would handle itself the same as a
 - The master node automatically has a taint applied, that is why nothing gets placed on it.
 - `Key Concept:` Taints only restrict pods from being placed on them. They do NOT gaurentee that a pod will be placed on a node just because it is tolerant.
 
-
 #### Namespaces
 
 Great for isolation (resource isolation, not security isolation)
@@ -257,7 +252,7 @@ A `key takeaway` here, the namespace encapsulates pods across nodes. It is not r
 ![namespaceexample](./Resources/screenshots/namespaceexample.png)
 
 - At startup, kubernetes creates 3 namespaces.
-  - Default 
+  - Default
     - Where everything you create is normally put.
   - kube-system
     - Isolated from user so they arent accidently deleted.
@@ -266,7 +261,7 @@ A `key takeaway` here, the namespace encapsulates pods across nodes. It is not r
     - Resources that should be made available to all the users are created.
 - You can specify a `pods` namespace in the yaml under metadata as well.
 - You can assign a quota of resources to each namespace, restricting a specific amount to each.
-- Resources inside a namespace can refer to themselves with their own name. 
+- Resources inside a namespace can refer to themselves with their own name.
   - For example, mysql.connect("db-service")
 - Resources in different namespaces can do this with a slightly different approach.
   - mysql.connect("db-service.dev.svc.cluster.local")
@@ -276,31 +271,28 @@ A `key takeaway` here, the namespace encapsulates pods across nodes. It is not r
 |---------------- | --------------- | --------------- | --------------- |
 | Service Name    | Namespace    | Service    | Domain    |
 
-  
 #### ResourceQuota
 
 These are used in conjunction with namespaces to actually specify how much resources you want to give each namespace. For example, you can limit the cpu, memory, pods, etc.
 
-
 #### Node Selectors and Affinity
 
-- Node selectors are simple and easy. 
+- Node selectors are simple and easy.
   - They mirror regular selectors with key:value pairs.
-  - Nodes must be labeled beforehand. 
+  - Nodes must be labeled beforehand.
   - Limited in capability, cannot say "I want to place on a large OR medium"
 - This is where node afinity takes over.
   - See the yaml file example below for an explanation.
   - A big part is the `requiredDuringSchedulingIgnoredDuringExecution`.
   - To wrap our heads around this, Pods have 2 stages, `DuringScheduling` and `DuringExecution`, with the latter occuring first.
-    - When we do `requiredDuringSchedulingIgnoredDuringExecution`, we are saying `DuringScheduling`the pod MUST match with the correct affinity of a node or it will not be deployed. 
+    - When we do `requiredDuringSchedulingIgnoredDuringExecution`, we are saying `DuringScheduling`the pod MUST match with the correct affinity of a node or it will not be deployed.
       - This is used when the pod `placement` is `crucial`.
-    - The other option, `preferredDuringSchedulingIgnoredDuringExecution`, is 
-      - This is when the placement is `wanted`, but `not crucial`. 
+    - The other option, `preferredDuringSchedulingIgnoredDuringExecution`, is
+      - This is when the placement is `wanted`, but `not crucial`.
     - It will prefer a node with the correct affinity, but it will still deploy to a node without one.
-  - For the second part `IgnoredDuringExecution`, this refers to pods that are already running (aka pods that are past `DuringScheduling`). 
+  - For the second part `IgnoredDuringExecution`, this refers to pods that are already running (aka pods that are past `DuringScheduling`).
     - If you update this value for these running pods, they will ignore it.
     - In newer versions, they are adding one to shutdown pods when updated. (required, required.)
-
 
 #### Affinity Vs Taint
 
@@ -316,29 +308,29 @@ These are used in conjunction with namespaces to actually specify how much resou
 - All our applications are deployed in containers.
 - The DNS service and networking solution can be deployed in containers.
 
-So, how do we run them! That is what the runtime engine is for. We need something that can handle running 
-all these different containers. 
+So, how do we run them! That is what the runtime engine is for. We need something that can handle running
+all these different containers.
 
 - Docker Engine
-- Containerd 
+- Containerd
 - Rocket
 
-Kubernetes allows different container runtimes as long as they adhere to the `OCI (Open Container Initiative)`. However 
-Docker was before Kubernetes, so they were not designed around OCI. To fix this, Kubernetes introduced `dockershim`, which 
+Kubernetes allows different container runtimes as long as they adhere to the `OCI (Open Container Initiative)`. However
+Docker was before Kubernetes, so they were not designed around OCI. To fix this, Kubernetes introduced `dockershim`, which
 was a bridge of sorts for supporting docker. **Dockershim is no longer supported**.
 
-##### Docker Vs. Containerd 
+##### Docker Vs. Containerd
 
 - Docker is built from numerous pieces.
-  - CLI 
-  - API 
-  - BUILD 
-  - VOLUMES 
-  - AUTH 
-  - SECURITY 
+  - CLI
+  - API
+  - BUILD
+  - VOLUMES
+  - AUTH
+  - SECURITY
   - containerd (their runtime for containers.)
 - Containerd is a PART of docker.
-  - It is `CRI` compatible, aka it conforms to `OCI`, so you can strip this away from the 
+  - It is `CRI` compatible, aka it conforms to `OCI`, so you can strip this away from the
   - comes with `ctr`, which provides limited set of features to interact with containers. Mainly used for debugging containerd.
   - `nerdctl` is a much better alternative for cml interactions with containerd. Basically 1to1 sub for docker commands.
 
@@ -349,17 +341,17 @@ This is an example of interaction with Architecture when creating a pod directly
 ![kubarch](./Resources/screenshots/kubarchexample.png)
 **source -> Mumshad Mannambeth Udemy course**
 
-3 initial steps always take place 
+3 initial steps always take place
 
-1. Authenticate the user 
-2. Validate the request 
+1. Authenticate the user
+2. Validate the request
 3. Retrieve data.
 
-4. Now, the **kube-apiserver** creates a pod for the request without assigning it to a node. It then updates the information in the etcd server that a new pod has been created, and then goes and updates the user that the pod has been created. So in this stage it goes, 
+4. Now, the **kube-apiserver** creates a pod for the request without assigning it to a node. It then updates the information in the etcd server that a new pod has been created, and then goes and updates the user that the pod has been created. So in this stage it goes,
 
         User -> kube-apiserver -> etcd -> kube-apiserver -> user.
 
-5. Now, the scheduler is always monitoring the kube-apiserver. It notices that there is a new pod there with no node assigned. It does things behind the scene as discussed above to decide what node to place the pod on, then tells the kube-apiserver the node it decided. The kube-apiserver then updates the information in the etcd cluster. So in this stage it goes, 
+5. Now, the scheduler is always monitoring the kube-apiserver. It notices that there is a new pod there with no node assigned. It does things behind the scene as discussed above to decide what node to place the pod on, then tells the kube-apiserver the node it decided. The kube-apiserver then updates the information in the etcd cluster. So in this stage it goes,
 
         scheduler -> kube-apiserver -> etcd
 
@@ -387,7 +379,7 @@ A single statement of what your goal is.
 
 In the `k8` world, those multiple commands above would be put into a yaml file, and you would only need to run apply for everything to occur.
 
-`Presented Issue` : You have a database running on a pod. You assign an address to access the DB and call it 
+`Presented Issue` : You have a database running on a pod. You assign an address to access the DB and call it
 something like service-mongo-db. You then change the address, and need to change it for the service as well. Normally,
 you would change it, Re-Build the image, push to the repo, and then pull into pod.
 
@@ -399,12 +391,12 @@ you would change it, Re-Build the image, push to the repo, and then pull into po
 
 Takes care of external configuration for your application.
 
-For above, 
+For above,
 DB_URL=service-mongo-db  
 change simply at this configuration point.  
 DB_URL=mongo-db  
 
-##### Secret 
+##### Secret
 
 Similiar to ConfigMap, but it is used to store secret data. (Passwords, certificates, etc.)
 
@@ -421,20 +413,20 @@ Stored in base64, <mark>NOT ENCRYPTED BY DEFAULT</mark>. Requires third party to
 
 ##### K8 Networking
 
-###### Ports 
+###### Ports
 
     Control plane
-    Protocol	Direction	Port Range	Purpose	Used By
-    TCP	Inbound	6443	Kubernetes API server	All
-    TCP	Inbound	2379-2380	etcd server client API	kube-apiserver, etcd
-    TCP	Inbound	10250	Kubelet API	Self, Control plane
-    TCP	Inbound	10259	kube-scheduler	Self
-    TCP	Inbound	10257	kube-controller-manager	Self
+    Protocol Direction Port Range Purpose Used By
+    TCP Inbound 6443 Kubernetes API server All
+    TCP Inbound 2379-2380 etcd server client API kube-apiserver, etcd
+    TCP Inbound 10250 Kubelet API Self, Control plane
+    TCP Inbound 10259 kube-scheduler Self
+    TCP Inbound 10257 kube-controller-manager Self
 
     Worker node(s)
-    Protocol	Direction	Port Range	Purpose	Used By
-    TCP	Inbound	10250	Kubelet API	Self, Control plane
-    TCP	Inbound	30000-32767	NodePort Services†	All
+    Protocol Direction Port Range Purpose Used By
+    TCP Inbound 10250 Kubelet API Self, Control plane
+    TCP Inbound 30000-32767 NodePort Services† All
 
 - For etcd in the control plane
   - 2380 is used for when you have multiple control planes.
@@ -466,18 +458,16 @@ compared to having to create each pod. Allows you to scale up and down.
 - Important aspect. Lets say you have a pod that is consistently writing to a volume. You cannot use just
 a blueprint on it, as they would need some mechanism to manage the writes (think of a lock file)
 
-To fix this, we have, 
+To fix this, we have,
 
 ##### Statefulset (sts)
 
 **Used for Stateful apps or databases**
 
-Substitute of deployments that is used for databases. 
+Substitute of deployments that is used for databases.
 
 These are also a pain. So it is better practice to host DB's outside of the cluster. However,
 if that is not possible then you can use this.
-
-
 
 #### Security
 
@@ -496,8 +486,7 @@ The first thing you need to do is secure the Host machine itself. At a bare mini
 - If you used kubeadm to deploy the server, you must also update that file with the following line. It should be located at /etc/kubernetes/manifests/kube-apiserver.yaml
   - --basic-auth-file=user-details.csv
 - You could then check the authentication to the api server with the following command
-  - curl -v -k https://master-node-ip:6443/api/v1/pods -u "user1:password123"
-
+  - curl -v -k <https://master-node-ip:6443/api/v1/pods> -u "user1:password123"
 
 Full walkthrough for Kubeadm
 
@@ -510,7 +499,6 @@ Create a user/password file like this
 Edit the kube-apiserver static pod manifest located at
 
     /etc/kubernetes/manifests/kube-apiserver.yaml
-
 
 You are going to want to add the volumeMount and volume respectively for where you are storing the auth file.
 
@@ -561,8 +549,6 @@ You can test the authentication with,
 
     curl -v -k https://localhost:6443/api/v1/pods -u "user1:password123"
 
-
-
 ###### TLS in Kubernetes Manually
 
 Server certificates for Servers
@@ -585,7 +571,7 @@ Special Cases
 
 A kubernetes cluster requires atleast 1 certificate authority to verify all the above certificates.
 
-Lets now take a look at generating the certificates. Our first steps will be getting the CA up and running. 
+Lets now take a look at generating the certificates. Our first steps will be getting the CA up and running.
 
 **Keep in mind this section is for a kubernetes cluster that was deployed "the hard way" , not using kubeadm. When deploying a cluster with kubeadm, the following process is automated and done during the initiation phase.**
 
@@ -601,7 +587,7 @@ Sign the certificate (Self signed by CA)
 
     openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
 
-__Lets move on to the client certificates. Lets start with the admin certificate.__
+**Lets move on to the client certificates. Lets start with the admin certificate.**
 
 First generate the keys
 
@@ -615,9 +601,7 @@ Sign the certificate (Signed by CA, so it is now valid inside cluster)
 
     openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt
 
-
-
-__Lets do the kube-scheduler client certificate__
+**Lets do the kube-scheduler client certificate**
 
 First generate the keys
 
@@ -631,7 +615,7 @@ Sign the certificate (Signed by CA, so it is now valid inside cluster)
 
     openssl x509 -req -in scheduler.csr -CA ca.crt -CAkey ca.key -out scheduler.crt
 
-__Lets do the kube-controller-manager client certificate__
+**Lets do the kube-controller-manager client certificate**
 
 First generate the keys
 
@@ -645,8 +629,7 @@ Sign the certificate (Signed by CA, so it is now valid inside cluster)
 
     openssl x509 -req -in controller-manager.csr -CA ca.crt -CAkey ca.key -out controller-manager.crt
 
-
-__Lets do the kube-proxy client certificate__
+**Lets do the kube-proxy client certificate**
 
 First generate the keys
 
@@ -659,7 +642,6 @@ Then generate the Certificate signing request and pass the above config to it.
 Sign the certificate (Signed by CA, so it is now valid inside cluster)
 
     openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -out kube-proxy.crt
-
 
 Okay, how do we use these certificates? Lets take the admin one for example. There are two ways we can use it. Either directly calling the REST API on the cml, or including it into kube-config on the client.
 
@@ -685,7 +667,7 @@ Via kube-config.yaml, you can check yours with kubectl config view, and edit the
 
 As a general rule of thumb, the CA certificate must be specified for every client and server so it can correctly authenticate itself.
 
-__Lets now do the server ones starting with the kube-api server certificate__
+**Lets now do the server ones starting with the kube-api server certificate**
 
 First generate the keys
 
@@ -716,7 +698,7 @@ Sign the certificate (Signed by CA, so it is now valid inside cluster)
 
     openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -out apiserver.crt
 
-__Lets do the kubelet client certificates__
+**Lets do the kubelet client certificates**
 
 For the kubelet clients, each node needs its own certificate in the naming scheme node01 - nodexxxx etc. You must also edit each kubelet-config.yaml file for each node to add the clientCAFile (ca cert) and the tlsCertFile (client cert) and tlsPrivateKeyFile (client key).
 
@@ -752,8 +734,7 @@ The kube-api server now has 3 certificates
 - apiserver-kubelet-client.crt / apiserver-kubelet-client.key
 - apiserver-etcd-client.crt / apiserver-etcd-client.key
 
-Where do these get passed in? 
-
+Where do these get passed in?
 
 Well, if we check the kubeapi config @ /etc/systemd/system/kube-apiserver.service , we get
 
@@ -776,7 +757,6 @@ Well, if we check the kubeapi config @ /etc/systemd/system/kube-apiserver.servic
       - --tls-private-key-file=/etc/kubernetes/pki/apiserver.key
     ...
 
-
 If we check the kubelet config @ /etc/systemd/system/kubelet.service we get
 
     ...
@@ -792,7 +772,7 @@ When interacting with kubernetes, you can handle the acceptance and distribution
 
 This whole process is mostly handled by the controller-manager. It also has two options where you can specify the clusters signing cert file and signing key file, under `/etc/kubernetes/manifests/kube-controller-manager.yaml`
 
-Create some temporary fields to, can remove as needed. 
+Create some temporary fields to, can remove as needed.
 
 ```bash
 export VAULT_K8S_NAMESPACE="vault" \
@@ -833,11 +813,12 @@ IP.1 = 127.0.0.1
 EOF
 ```There was a formatting error, skip this line when copying. (include the EOF in the above line though)
 ```
+
 Generate CSR (Certificate Signing Request) from above config and private key. You can do this without the config if not required.
 
     openssl req -new -key ${WORKDIR}/vault.key -out ${WORKDIR}/vault.csr -config ${WORKDIR}/vault-csr.conf
 
-Create CSR (Certificate Signing Request) Yaml file to send to Kubernetes. This is what is important. 
+Create CSR (Certificate Signing Request) Yaml file to send to Kubernetes. This is what is important.
 
 ```bash
 cat > ${WORKDIR}/csr.yaml <<EOF
@@ -907,7 +888,7 @@ kubectl config view \
 
 ###### Kubernetes Networking Policies
 
-By default, Kubernetes is designed as an Allow all mesh, where everything can talk to everything. 
+By default, Kubernetes is designed as an Allow all mesh, where everything can talk to everything.
 
 Within and without kubernetes there is `Ingress` and `Egress`. These are decided from the perspective of the object, where incoming is ingress and outgoing is egress.
 
@@ -931,9 +912,9 @@ If we were to convert these into rules, we would be left with the following,
 
 ![policyrules](./Resources/screenshots/networkpolicyrules.png)
 
-Lets run with this idea, what if we dont want the website to access the etcd directly, but be forced to communicate via the api to reach it. To accomplish this, we would create an ingress network policy for the etcd pod that only allows ingress from the api. When you create the policy, it goes from allow all to only that rule, so you do not have to block by default. 
+Lets run with this idea, what if we dont want the website to access the etcd directly, but be forced to communicate via the api to reach it. To accomplish this, we would create an ingress network policy for the etcd pod that only allows ingress from the api. When you create the policy, it goes from allow all to only that rule, so you do not have to block by default.
 
-Also, you do not have to worry about returning traffic. If you allow ingress from somewhere, egress related to that ingress is automatically allowed out. It is the same as normal networking where you typically allow connected, established. 
+Also, you do not have to worry about returning traffic. If you allow ingress from somewhere, egress related to that ingress is automatically allowed out. It is the same as normal networking where you typically allow connected, established.
 
 However, it is extremely important to realize the following difference, although my communication is allowed back if I allow ingress from the API pod, unrelated communication is NOT allowed unless specifically stated. For example, if the etcd pod was trying to make an API call unrelated to the current communication, it would not be allowed without the proper egress rule.
 
@@ -947,7 +928,7 @@ The final case to consider, what about an IP outside of the kubernetes cluster? 
 
 ![npingressorrules](./Resources/screenshots/networkpolicyorrules.png)
 
-In the above example, notice the 3 - next to podSelector, namespaceSelector, and ipBlock. Since these are all seperated, they are all OR rules. If any of the three match traffic is allowed, now compare that to below. 
+In the above example, notice the 3 - next to podSelector, namespaceSelector, and ipBlock. Since these are all seperated, they are all OR rules. If any of the three match traffic is allowed, now compare that to below.
 
 ![npingressandrules](./Resources/screenshots/networkpolicyandrules.png)
 
@@ -971,14 +952,14 @@ You can also specify certain pods within a namespace if you do not want to give 
 
 ###### RoleBinding
 
-Similiar to the process of creating cluster contexts for users, you must link the user to the role for it to take effect. This is the simple function of the rolebinding. 
+Similiar to the process of creating cluster contexts for users, you must link the user to the role for it to take effect. This is the simple function of the rolebinding.
 
 ## Configuration Files
 
 ### YAML
 
 - Each YAML file consists of 3 parts.
-  - Metadata 
+  - Metadata
   - Specification (Different ones depending on kind:)
   - status (auto generated)
     - If desired != Actual, Kubernetes attempts to fix it. (This comes from the etcd)
@@ -1020,7 +1001,9 @@ spec:
     - name: test 
       image: nginx
 ```
+
 This is just our normal pod declaration
+
 ```yaml
 affinity:
   nodeAffinity:
@@ -1033,18 +1016,19 @@ affinity:
           - Large
           - small
 ```
+
 - `affinity` is our attribute
-- `nodeAffinity` we are referring to nodes affinity 
-- `requiredDuringSchedulingIgnoredDuringExecution` 
+- `nodeAffinity` we are referring to nodes affinity
+- `requiredDuringSchedulingIgnoredDuringExecution`
   - There are two stages during pod creation, DuringScheduling and DuringExecution.
 - `nodeSelectorTerms` array where we will specify the key,value pairs.
 - `matchExpressions` similiar to selector, match the below attributes.
-- `key: size` this is the key to look for 
+- `key: size` this is the key to look for
 - `operator: in` ensures pod will be placed on node if its value is in the following list.
   - For example, could do operator: NotIn to not put in any of the labels
 - `values:` list of values to search for, remember it uses the provided key.
 
-You can also only check for the key with 
+You can also only check for the key with
 
 ```yaml
 ...
@@ -1052,8 +1036,7 @@ You can also only check for the key with
   operator: Exists
 ```
 
-    
-##### Full Deployment 
+##### Full Deployment
 
 ```yaml
 apiVersion: apps/v1
@@ -1105,8 +1088,7 @@ spec:
       targetPort: 27017
 ```
 
-
-Lets break this up. 
+Lets break this up.
 
 ```yaml
 apiVersion: apps/v1
@@ -1116,12 +1098,12 @@ metadata:
   labels:
     app: mongo
 ```
+
 - The `apiVersion` will be supplied when you check on Kubernetes docs.
 - The `kind` is a Deployment, remember above we stated deployments are for making blueprints of a pod, allowing you to deploy more than 1.
-- The `metadata` is a required part. 
-- The `name` is the name of the deployment 
+- The `metadata` is a required part.
+- The `name` is the name of the deployment
 - The `labels` here are optional.
-
 
 ```yaml
 spec:
@@ -1130,12 +1112,12 @@ spec:
     matchLabels:
       app: mongo
 ```
+
 - `spec` is a required field.
 - `replicas` is saying how many copies of the pod do you want running
 - `selector` is where we can say what pod these settings should apply to
 - `matchLabels` is saying all pods that match this label (id,key pair) belong to the deployment above.
   - Important to note. `app: mongo` is a value/key pair. It can be anything, but it is best practice to use app as the id.
-
 
 ```yaml
 template: # Blueprint (configuration) for the pods 
@@ -1149,17 +1131,17 @@ template: # Blueprint (configuration) for the pods
         ports:
         - containerPort: 27017 # Reference the docker image for this. Look for "Connect to x from another docker container"
 ```
+
 - `template` is where we configure the blueprint for the pods.
 - `metadata` required field. Keep in mind, we are now configuring the POD, not the deployment itself.
-- `labels` is shared across all replicas of the pod. It is what gets matched against the above check and 
+- `labels` is shared across all replicas of the pod. It is what gets matched against the above check and
 is also checked for the service access.
-- `spec` is required, but notice the different fields since we are configuring a template now. 
+- `spec` is required, but notice the different fields since we are configuring a template now.
 - `containers` We declare we want to create a container inside this pod (1 is best practice)
-- `name` name of the container 
+- `name` name of the container
 - `image` this is straight from docker. Grab these from dockerhub
-- `ports` Important, reference the docker image you copied for this. It will most likely be under a section 
+- `ports` Important, reference the docker image you copied for this. It will most likely be under a section
 "Connect to x from another docker container."
-
 
 BUT WAIT..HOW DO I LOAD ENV VARIABLES LISTED ON DOCKER HUB??
 
@@ -1196,8 +1178,6 @@ data:
   password: bW9uZ29wYXNz
 ```
 
-
-
 This is the service parts.
 
 ```yaml
@@ -1206,12 +1186,12 @@ kind: Service
 metadata:
   name: mongo-service
 ```
+
 - `apiVersion` again, pulled off kubernetes docs.
 - `kind` This is a service. Remember, services are used to assign permanent addresses to pods,
 and act as load balancers.
-- `metadata` required. 
+- `metadata` required.
 - `name` name of service, endpoint used for access. Defined in our `mongo-config.yaml` under `mongo-url`. Must be same.
-
 
 ```yaml
 spec:
@@ -1222,17 +1202,17 @@ spec:
       port: 8080
       targetPort: 27017
 ```
+
 - `spec` required, this is for a service though, so its slightly different.
-- `selector` Select the pods to forward requests to 
+- `selector` Select the pods to forward requests to
 - `app.kubernetes.io/name` **Common name** of pods to forward to , should match template labels
-- `ports` Define ports on how to interact 
+- `ports` Define ports on how to interact
 - `protocol` Protocol to access service port.
-- `port` This is the Service port. Remember, a service is defined in the network with its own IP address. This is the 
+- `port` This is the Service port. Remember, a service is defined in the network with its own IP address. This is the
 port you will access it at. Can change to what we want, best practice to set to the same as targetPort (easy to remember)
-- `targetPort` This is the containerPort of deployment. Should always be the same. The service forwards requests to 
+- `targetPort` This is the containerPort of deployment. Should always be the same. The service forwards requests to
 the application within the pod via this port.
 
- 
 The above is for an `INTERNAL SERVICE`. If you want an `EXTERNAL SERVICE` you need to add the elemnts below,
 
 ```yaml
@@ -1246,12 +1226,11 @@ spec:
       targetPort: 27017
       nodePort: 32000
 ```
-- `type` Is the service type. By default it is set to `ClusterIP` which represents an internal service. An external service 
-is represented by `NodePort`. 
+
+- `type` Is the service type. By default it is set to `ClusterIP` which represents an internal service. An external service
+is represented by `NodePort`.
 - `nodePort` Opens a port on the nodes IP `NodeIP:NodePort`
   - IMPORTANT -> Must be between `30000-32767`
-
-
 
 #### Pod Example
 
@@ -1269,13 +1248,16 @@ spec:
   - name: nginx-controller
     image: nginx
 ```
+
 This is the pods that would be deployed
 
 ```bash
 NAME             READY   STATUS    RESTARTS   AGE 
 nginx            1/1     Running   0          45m
 ```
+
 #### ReplicationController Example
+
 ```yaml
 apiVersion: v1
 kind: ReplicationController
@@ -1299,13 +1281,16 @@ spec:
         image: nginx 
   replicas: 3
 ```
+
 This is the pods that would be deployed.
+
 ```bash
 NAME             READY   STATUS    RESTARTS   AGE
 myapp-rc-6d44f   1/1     Running   0          11s
 myapp-rc-jb7b6   1/1     Running   0          11s
 myapp-rc-mqv2s   1/1     Running   0          11s
 ```
+
 #### ReplicaSet Example
 
 ```yaml
@@ -1336,6 +1321,7 @@ spec:
       # key: value
       type: front-end
 ```
+
 This is the pods that would be deployed.
 
 ```bash
@@ -1344,6 +1330,7 @@ myapp-replicaset-5whw4   1/1     Running   0          70s
 myapp-replicaset-qzp9k   1/1     Running   0          70s
 myapp-replicaset-xq6vg   1/1     Running   0          70s
 ```
+
 #### Deployment Example
 
 ```yaml
@@ -1401,8 +1388,10 @@ spec:
   selector:
     app: myapp 
     type: front-end
-``` 
+```
+
 For reference, the selector params are taken from these spots in a pod declaration.
+
 ```yaml
 apiVersion: v1 
 kind: Pod
@@ -1433,6 +1422,7 @@ spec:
     app: myapp 
     type: back-end
 ```
+
 #### Labels & Selectors & Annotations Example
 
 ```yaml
@@ -1458,6 +1448,7 @@ spec:
       - name: simple-webapp
         image: nginx 
 ```
+
 #### Taint & Tolerations example
 
 ```yaml
@@ -1480,6 +1471,7 @@ apiVersion: v1
 ```
 
 This is equivilent to,
+
 ```bash
 kubectl taint nodes node1 app=blue:NoSchedule
 ```
@@ -1492,8 +1484,9 @@ kind: Namespace
 metadata:
   name: dev 
 ```
+
 #### ResourceQuota
- 
+
  ```yaml
 apiVersion: v1 
 kind: ResourceQuota
@@ -1590,8 +1583,7 @@ spec:
 
 #### Resource Quota
 
-
-#### Role 
+#### Role
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -1631,8 +1623,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-
-
 #### Persistent Volume (PV)
 
 ```yaml
@@ -1654,6 +1644,7 @@ spec:
   hostPath:
     path: "/data/nfs"
 ```
+
 #### Persistent Volume Claim (PVC)
 
 ```yaml
@@ -1668,10 +1659,10 @@ spec:
     requests:
       storage: 50Mi
 ```
+
 ### Update configuration / Rollout Control
 
-
-#### spec.revisionHistoryLimitt 
+#### spec.revisionHistoryLimitt
 
 Tells how many revision versions to keep for rolling back to. (Replica sets)
 
@@ -1687,8 +1678,7 @@ Tells how long to wait during a rollout for each new replica to come online. (Ti
 
 #### spec.minReadySecondss
 
-
-#### spec.strategyy 
+#### spec.strategyy
 
     strategy:
       type: RollingUpdate
@@ -1696,8 +1686,7 @@ Tells how long to wait during a rollout for each new replica to come online. (Ti
         maxUnavailable: 1 
         maxSurge: 1 
 
-This is saying, 
-
+This is saying,
 
 ## Minikube Cluster
 
@@ -1705,18 +1694,18 @@ This is a way to test your production deployment on a single machine. Both maste
 
 ### Install / Setup on Linux
 
-Always reference the official docs for updates. -> https://minikube.sigs.k8s.io/docs/start/
+Always reference the official docs for updates. -> <https://minikube.sigs.k8s.io/docs/start/>
 
 Pull
 
     curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-Install 
+Install
 
     sudo install minikube-linux-amd64 /usr/local/bin/minikube
 
 Minikube requires docker to run `dont ask`, skip this if you already have it installed.
 
-Add key 
+Add key
 
     # Add Docker's official GPG key:
     sudo apt-get update
@@ -1752,7 +1741,7 @@ You now have the minikube cluster running. See below to start interacting with i
 
 ## crictl
 
-Built by Kubernetes, used to `inspect and debug` container runtimes. As of recently, it is recommended to specify the runtime to 
+Built by Kubernetes, used to `inspect and debug` container runtimes. As of recently, it is recommended to specify the runtime to
 crictl.
 
     crictl --runtime-endpoint
@@ -1776,14 +1765,12 @@ crictl.
     crictl exec -i <containerid> ls 
 
 ### View Logs
-    
+
     crictl logs <containerId>
 
 ### View Pods
 
     crictl pods 
-
-
 
 ## Kubectl (cml)
 
@@ -1796,7 +1783,6 @@ This is the cml interface way to access the master api server.
 #### View all resource types created in cluster
 
     kubectl get all
-
 
 #### Get detailed information on a resource type
 
@@ -1856,7 +1842,6 @@ This is the cml interface way to access the master api server.
 
     kubectl get pods --selector function=front-end,app=App1
 
-
 ### Create Objects
 
 #### Deploy yaml file
@@ -1878,7 +1863,7 @@ This is the cml interface way to access the master api server.
   
     kubectl expose pod valid-pod --port=444 --name=frontend
 
-#### Create a pod without making it and instead outputting to yaml.
+#### Create a pod without making it and instead outputting to yaml
 
     kubectl run nginx --image=nginx:latest --dry-run=client -o yaml > temp.yaml
 
@@ -1887,7 +1872,6 @@ This is the cml interface way to access the master api server.
     kubectl create namespace <namespacename>
 
     kubectl create -f namespace-dev.yaml
-
 
 ### Update Objects
 
@@ -1939,7 +1923,6 @@ Below will not change yaml file.
     
     kubectl scale --replicas=6 replicaset <replicaSetName>
 
-
 #### Switch to namespace
 
     kubectl config set-context $(kubectl config current-context) --namespace=dev 
@@ -1960,18 +1943,16 @@ Below will not change yaml file.
     Also, instead of having to supply a -f file.yaml, you can supply <resourceType>/<resourceName>
       kubectl scale --replicas=2 rs/new-replica-set
 
-
-
 ## Tutorials | Useful stuff to remember
 
 ### Secrets -> data method -> Base 64
 
-Convert user / pass to base 64 
+Convert user / pass to base 64
 
     echo -n 'mongouser' | base64
     echo -n 'mongopass' | base64
 
-Output would be 
+Output would be
 
     bW9uZ291c2Vy
     bW9uZ29wYXNz
@@ -1998,7 +1979,7 @@ Place the following inside
       name: admin-user
       namespace: kubernetes-dashboard
 
-Deploy it 
+Deploy it
 
     kubectl apply -f dashboard-adminuser.yaml 
 
@@ -2006,11 +1987,11 @@ Get the token for login, used in last step.
 
     kubectl -n kubernetes-dashboard create token admin-user 
 
-Deploy the dashboard 
+Deploy the dashboard
 
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml 
 
-Start the proxy for dashboard 
+Start the proxy for dashboard
 
     kubectl proxy 
 
@@ -2018,26 +1999,23 @@ Access it and paste the token from earlier step.
 
     http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/.
 
-
 ### Deploying Bare metal K8 cluster across 1 control and 2 worker nodes
 
 Also, note this great [video](https://www.youtube.com/watch?v=iwlNCePWiw4)
 
 I am following this [guide](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/) to install kubeadm.
 
-
-
-First disable Swap file. 
+First disable Swap file.
 
 **For Ubuntu**
 
-To check if swap is on 
+To check if swap is on
 
     sudo swapon --show  
 temporarily disable swap file
 
     sudo swapoff -a 
-      
+
 Permanently disable swap file
 
     sudo swapoff -a 
@@ -2049,12 +2027,11 @@ Permanently disable swap file
     check its off  
     sudo swapon --show
 
-
 Now, ensure MAC address and UUID are unique for each node.
 
 **For Ubuntu**
 
-Check MAC address 
+Check MAC address
 
     ip a 
 
@@ -2062,10 +2039,9 @@ Check MAC address
     link/ether 52:54:00:03:b4:f8 brd ff:ff:ff:ff:ff:ff
     52:54:00:03:b4:f8 is mac address
 
-Check UUID 
+Check UUID
 
     sudo cat /sys/class/dmi/id/product_uuid
-
 
 Finally, I am going to setup the hostnames.
 
@@ -2091,18 +2067,17 @@ Then, change the /etc/hosts file on the `Master (control plane) only`
 
     sudo vim /etc/hosts 
 
-Paste this, change ips to whatever you use. 
-    
+Paste this, change ips to whatever you use.
+
     # K8 cluster nodes 
     10.1.30.10 k8s-master.lab.local
     10.1.30.20 k8s-worker1.lab.local
     10.1.30.21 k8s-worker2.lab.local
 
-While you are here, also change the 127.0.1.1 line at the top 
+While you are here, also change the 127.0.1.1 line at the top
 to reflect the hostnames we set above. For example,
 
     127.0.1.1 k8s-master.lab.local
-
 
 Pre-requirements
 
@@ -2130,7 +2105,6 @@ Apply sysctl params without reboot
 
     sudo sysctl --system
 
-
 **This is back to being on all**
 
 Install a container runtime, some options include docker engine, containerd, CRI-O. We will use containerd.
@@ -2139,7 +2113,7 @@ Install a container runtime, some options include docker engine, containerd, CRI
 
 For future [reference](https://docs.docker.com/engine/install/ubuntu/)
 
-Add Docker's official GPG key 
+Add Docker's official GPG key
 
     sudo apt-get update
     sudo apt-get install ca-certificates curl gnupg
@@ -2159,7 +2133,7 @@ Install latest version of `containerd.io`
 
     sudo apt update && sudo apt install -y containerd.io
 
-Configure `containerd` to use systemd as cgroup 
+Configure `containerd` to use systemd as cgroup
 
     containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1 
 
@@ -2171,17 +2145,15 @@ Restart services
 
     sudo systemctl restart containerd && sudo systemctl enable containerd
 
-
-
-Install kubeadm, kubelet and kubectl 
+Install kubeadm, kubelet and kubectl
 
     sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gpg
 
-Grab key 
+Grab key
 
     curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg 
 
-Add repo 
+Add repo
 
     echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list 
 
@@ -2189,13 +2161,11 @@ Install
 
     sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
 
- 
-
 #### Deploying the cluster
 
 **Give it a good old reboot before this.** -- (If you used ansible dependencies install, start here.)
 
-ON THE `CONTROL PLANE` 
+ON THE `CONTROL PLANE`
 
 Extremely important sidenote, this CIDR range **CANNOT** be in use on your network anywhere (accessible).
 
@@ -2217,11 +2187,11 @@ This is based off what I was given as output, yours may be slightly different or
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
     sudo chown $(id -u):$(id -g) $HOME/.kube/config 
 
-Test it is working with 
+Test it is working with
 
     kubectl cluster-info
 
-Side-note, I got an error about not being able to retrieve from port 8433. This was because when I did 
+Side-note, I got an error about not being able to retrieve from port 8433. This was because when I did
 
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
     It prompted for 
@@ -2232,7 +2202,7 @@ Side-note, I got an error about not being able to retrieve from port 8433. This 
 
 If you already have the join node output copied, skip the next 3 commands.
 
-If you didnt copy the token before its fine, just run 
+If you didnt copy the token before its fine, just run
 
     kubeadm token list
 
@@ -2256,7 +2226,7 @@ Test your creation
 
     kubectl get nodes
 
-You will notice it says `NotReady` for all 3, this is because we do not have a `CNI (Container Network Interface)` setup for the cluster. As a quick info sess, CNI handles the Pod-to-Pod communication. Read more [here](https://kubernetes.io/docs/concepts/services-networking/). 
+You will notice it says `NotReady` for all 3, this is because we do not have a `CNI (Container Network Interface)` setup for the cluster. As a quick info sess, CNI handles the Pod-to-Pod communication. Read more [here](https://kubernetes.io/docs/concepts/services-networking/).
 
 Install one of the below CNIS, then come back here.
 
@@ -2288,7 +2258,7 @@ Install custom resources (we need this for cidr change). (BTW this is an `Instal
     kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml 
 
 We need to change our CIDR range to what we set at the beginning, referenced [here](https://docs.tigera.io/calico-cloud/networking/ipam/initial-ippool). Change the cidr: line to what we made earlier.
-    
+
     kubectl edit Installation default 
 
 Check all the pods that are `Calico pods` are running with this. (Just keep it open till they all say **running** to confirm.)
@@ -2432,7 +2402,7 @@ Then apply it,
     kubectl apply -f web-app-deployment.yml
 
 And test it. Get the EXTERNAL-IP of the service and then curl it.
-    
+
     kubectl get svc web-app
     curl <EXTERNAL-IP> 
 
@@ -2446,7 +2416,6 @@ The ingress controller i am using is [nginx ingress controller](https://docs.ngi
 
 There are two sources to install this, kubernetes community and nginx offical site. I prefer the community and have found the most success with it.
 
-
 #### From Kubernetes [Community Docs](https://kubernetes.github.io/ingress-nginx/deploy/) (Preffered))
 
 ##### Option A - Helm
@@ -2455,7 +2424,7 @@ This is an all in one install / update solution that will place it all in ingres
 
     helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace ingress-nginx --create-namespace
 
-You can check the setable values 
+You can check the setable values
 
     helm show values ingress-nginx --repo https://kubernetes.github.io/ingress-nginx
 
@@ -2463,9 +2432,7 @@ You can check the setable values
 
     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
 
-
 #### From Nginx [Official Site](https://docs.nginx.com/nginx-ingress-controller/)
-
 
 ##### Option A - Helm Via OCI Registry
 
@@ -2476,7 +2443,6 @@ The service will be deployed as my-release-nginx-ingress-controller, change my-r
 To uninstall (Replace my-release with whatever name you used.)
 
     helm uninstall my-release 
-
 
 ##### Option B - Helm Manually
 
@@ -2540,11 +2506,11 @@ Apply this,
     kubectl apply -f web-app-ingress.yml
 
 You can test this locally by adding the mapping to your /etc/hosts file. For example,
-    
+
     10.35.40.31 web-app.home-k8s.lab
 
-The IP you add above is from the following command and under EXTERNAL-IP, Look for the nginx-ingress-controller service,    
-    
+The IP you add above is from the following command and under EXTERNAL-IP, Look for the nginx-ingress-controller service,
+
     kubectl get svc -n nginx-ingress
 
 Finally,
@@ -2555,8 +2521,8 @@ Finally,
 
 Go to wherever your CA is (Mine is cloudflare) and do the following.
 
-- For more detail, you want to create an A record with your domain name (www.example.com) and have it point to the external IP.
-- Then you can create a CNAME wild card (name would be *) and have it point to your domain name which will point any subdomains to www.example.com.
+- For more detail, you want to create an A record with your domain name (<www.example.com>) and have it point to the external IP.
+- Then you can create a CNAME wild card (name would be *) and have it point to your domain name which will point any subdomains to <www.example.com>.
 
 To test it, you can do the following which is sourced from part 4 [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/)
 
@@ -2568,14 +2534,11 @@ Test Service
 
     kubectl apply -f https://raw.githubusercontent.com/cert-manager/website/master/content/docs/tutorials/acme/example/service.yaml
 
-Test Ingress, change the hosts values to your DNS name you redirected to earlier (www.example.com)
+Test Ingress, change the hosts values to your DNS name you redirected to earlier (<www.example.com>)
 
     kubectl create --edit -f https://raw.githubusercontent.com/cert-manager/website/master/content/docs/tutorials/acme/example/ingress.yaml
 
 You should then be able to browse to this on the web, however it will give an insecure warning since we havent implemented secure certificates. We can use cert-manager for that.
-
-
-
 
 ### Installing CSI driver for NFS Storage
 

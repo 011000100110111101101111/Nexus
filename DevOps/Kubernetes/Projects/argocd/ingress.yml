@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argocd-server-ingress
+  namespace: argocd
+  annotations:
+    # If using certmanager
+    # Used to provide wildcard domain prefixs to base domain
+    kubernetes.io/tls-acme: "true"
+    # This is clusterissuer you set up with cert-manager
+    cert-manager.io/cluster-issuer: development-issuer
+    # Disable http
+    kubernetes.io/ingress.allow-http: "false"
+    # Default
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # I needed to add this for it to work
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: argocd.<domain>
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: argocd-server
+            port:
+              name: https
+  tls:
+    - hosts:
+      - argocd.<domain>
+      secretName: argocd-server-tls # as expected by argocd-server
