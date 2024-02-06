@@ -4,7 +4,7 @@
 
 ## General Information
 
-This will deploy a vault server in standalone mode. 
+This will deploy a vault server in standalone mode.
 
 ### Open Ports
 
@@ -78,7 +78,7 @@ Make easy with tmp vars, change to what you want.
 export VAULT_K8S_NAMESPACE="vault" \
 export VAULT_HELM_RELEASE_NAME="vault" \
 export VAULT_SERVICE_NAME="vault-internal" \
-export K8S_CLUSTER_NAME="cluster.local" \
+export K8S_CLUSTER_NAME="kubernetes" \
 export WORKDIR=/tmp/vault
 ```
 
@@ -116,6 +116,7 @@ DNS.3 = *.${VAULT_K8S_NAMESPACE}
 IP.1 = 127.0.0.1
 EOF
 ```
+
 Generate CSR
 
     openssl req -new -key ${WORKDIR}/vault.key -out ${WORKDIR}/vault.csr -config ${WORKDIR}/vault-csr.conf
@@ -244,7 +245,6 @@ helm install vault hashicorp/vault --namespace vault -f values.yml
 
 ## Next Steps
 
-
 ### Unsealing Vault
 
 Now we need to unseal the vault. Whether you have 1 pod or multiple running vault, just choose one. Then run the following command with the chosen pod.
@@ -278,7 +278,6 @@ It is possible to generate new unseal keys, provided you have a quorum of
 existing unseal keys shares. See "vault operator rekey" for more information.
 ```
 
-
 In this case, it says the unseal threshold is 3 keys. So using 3 unique keys from the 5 given above, run the following commands. (The only thing you are changing is the vault-0 name for what pod you used, and the Unseal Key # to use 3 different keys.)
 
     kubectl exec -ti vault-0 -- vault operator unseal # ... Unseal Key 1
@@ -287,14 +286,26 @@ In this case, it says the unseal threshold is 3 keys. So using 3 unique keys fro
 
 Check that your vault pod is correctly running now, then head over to the UI to log in. It will ask for a token, which is the *Initial Root Token* from above. To find it where it is running, you should check your services and look for whatever IP your loadbalancer gave it (Or whatever method you used)
 
+**IF YOU ARE IN HA MODE, TO JOIN VAULT-1, VAULT-2 ETC YOU MUST DO RAFT JOIN**
+
+```bash
+# Join the vault-1 pod to the Raft cluster.
+kubectl exec -ti vault-1 -- vault operator raft join http://vault-0.vault-internal:8200
+# Join the vault-2 pod to the Raft cluster.
+kubectl exec -ti vault-2 -- vault operator raft join http://vault-0.vault-internal:8200
+```
+
     kubectl get services
 
 ### Setting up secret injector #TODO Continue looking into vault sidecar
 
-
 ## Troubleshooting commands
 
 ## Troubleshooting Topics
+
+### Ingress
+
+Ingress is currently not supported for the UI as it cannot do subdomain pathing. Must use IP :(.
 
 ## Resources
 
