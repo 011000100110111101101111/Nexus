@@ -22,7 +22,10 @@ spec:
           - name: TZ
             value: "US/Eastern"
           - name: WEBPASSWORD
-            value: password
+            valueFrom:
+              secretKeyRef:
+                name: pihole-secret
+                key: password
           - name: DNSMASQ_USER
             value: root
           - name: DNS1
@@ -53,13 +56,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole-service
+  name: pihole-ui-service
   labels:
     app: pihole
   namespace: homelab
-  # This is to expose service to tailscale directly :D, remove if not using tailscale
-  annotations:
-    tailscale.com/expose: "true"
 spec:
   selector:
     app: pihole
@@ -68,10 +68,22 @@ spec:
     port: 8000
     protocol: TCP
     targetPort: 80
-  # name: https
-    #port: 443
-    #protocol: TCP
-    #targetPort: 443
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-dns-service
+  labels:
+    app: pihole
+  namespace: homelab
+  annotations:
+    tailscale.com/expose: "true"
+spec:
+  selector:
+    app: pihole
+  ports:
   - name: dns-u
     port: 53
     protocol: UDP
@@ -86,6 +98,40 @@ spec:
     targetPort: 67
   type: LoadBalancer
 
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pihole-ingress
+  namespace: homelab
+  annotations:
+    # If using certmanager
+    # Used to provide wildcard domain prefixs to base domain
+    kubernetes.io/tls-acme: "true"
+    # This is clusterissuer you set up with cert-manager
+    cert-manager.io/cluster-issuer: development-issuer
+    # Default
+    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # I needed to add this for it to work
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pihole.nexus-core.dev
+    http:
+      paths:
+      - path: /admin
+        pathType: Prefix
+        backend:
+          service:
+            name: pihole-ui-service
+            port:
+              name: http
+  tls:
+    - hosts:
+      - pihole.nexus-core.dev
+      secretName: pihole-tls
 ---
 
 apiVersion: v1
@@ -115,3 +161,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
+
