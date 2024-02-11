@@ -1,0 +1,72 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: create the 'k8smanager' user
+      user:
+        name: k8smanager
+        generate_ssh_key: true
+        ssh_key_type: "id_ed25519"
+        groups: sudo
+        state: present
+        create_home: yes
+        shell: /bin/bash
+
+    - name: allow 'k8smanager' to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        line: "k8smanager ALL=(ALL) NOPASSWD: ALL"
+        validate: "visudo -cf %s"
+
+    # - name: create .ssh directory
+    #   file:
+    #     path: /home/k8smanager/.ssh
+    #     state: directory
+    #     owner: k8smanager
+    #     group: k8smanager
+    #     mode: 0700
+
+    # - name: create authorized keys file
+    #   copy:
+    #     content: ""
+    #     dest: /home/k8smanager/.ssh/authorized_keys
+    #     owner: k8smanager
+    #     group: k8smanager
+
+    - name: Configure known_hosts
+      blockinfile:
+        path: /home/k8smanager/.ssh/authorized_keys
+        backup: yes
+        block: |
+          # Trusted keys :D
+          # Mobile
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINs8KbefMC7eYXEXL2sQPKJ4gkh/+hB6vzuNISw5zgFn
+          # Stationary
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOBwEfY4oFR0gc5aqdWWhWJq+0x+9qA1m4sRW+lOgE3B
+          # WSL
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBembU+l9izOhhWP7GXol+yLWkquFVilpCI5pfdbwuC9
+
+- hosts: control_plane
+  become: yes
+  tasks:
+    - name: initialize the cluster
+      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 >> cluster_initialized.txt
+      args:
+        chdir: $HOME
+        creates: cluster_initialized.txt
+
+    - name: create .kube directory
+      file:
+        path: /home/k8smanager/.kube
+        state: directory
+        owner: k8smanager
+        group: k8smanager
+        mode: 0755
+
+    - name: copy admin.conf to user's kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/k8smanager/.kube/config
+        remote_src: yes
+        owner: k8smanager
+        mode: 0600

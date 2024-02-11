@@ -25,82 +25,84 @@ Sidenote: Longhorn is a great solution when running a baremetal kubernetes clust
 
 ### Longhorn Via Helm
 
-Add longhorn Repo and update
+```bash
+# Add longhorn Repo and update
+helm repo add longhorn https://charts.longhorn.io
+helm repo update
 
-    helm repo add longhorn https://charts.longhorn.io
-    
-    helm repo update
+# Install longhorn in its own namespace
+LONVER=$(curl -s https://api.github.com/repos/longhorn/longhorn/releases/latest|grep tag_name|cut -d '"' -f 4)
+helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version $LONVER
 
-Install longhorn in its own namespace
-
-    helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.5.3
-
-Check success
-
-    kubectl -n longhorn-system get pod
+# Check success
+kubectl -n longhorn-system get pod
+```
 
 ### Longhorn Manually (Kubectl)
 
-Apply the manifest
+```bash
+# Apply the manifest
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml
 
-    kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml
+# Or if you want to look at it before applying
+LONVER=$(curl -s https://api.github.com/repos/longhorn/longhorn/releases/latest|grep tag_name|cut -d '"' -f 4)
+wget https://raw.githubusercontent.com/longhorn/longhorn/${LONVER}/deploy/longhorn.yaml
+kubectl apply -f longhorn.yaml
 
-If you want to look at it before applying
+# Check success
+kubectl get pods --namespace longhorn-system --watch
+```
 
-    wget https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml\
+### (Optional) Setting longhorn as default CSI
+TODO: Had no internet
 
-    kubectl apply -f longhorn.yaml
-
-Check success
-
-    kubectl get pods --namespace longhorn-system --watch
 
 ### Testing
-
 To test this, create a PVC using the storageClassName longhorn.
 
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-    name: pihole-etc-longhorn-claim
-    namespace: homelab
-    spec:
-    storageClassName: longhorn
-    accessModes:
-        - ReadWriteOnce
-    resources:
-        requests:
-        storage: 5Gi
-
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+name: pihole-etc-longhorn-claim
+namespace: homelab
+spec:
+storageClassName: longhorn
+accessModes:
+    - ReadWriteOnce
+resources:
+    requests:
+    storage: 5Gi
+```
 Then, claim it for a deployment under volumes,
-
-    spec:
-    replicas: 1
-    selector:
-        matchLabels:
+```yaml
+spec:
+replicas: 1
+selector:
+    matchLabels:
+    app: pihole
+template:
+    metadata:
+    labels:
         app: pihole
-    template:
-        metadata:
-        labels:
-            app: pihole
-        spec:
-        containers:
-        - name: pihole
-            image: pihole/pihole:latest
-            ...
-            volumeMounts:
-            - name: etc
-            mountPath: "/etc/pihole"
-            - name: dnsmasq
-            mountPath: "/etc/dnsmasq.d"
-        volumes:
-            - name: etc
-            persistentVolumeClaim:
-                claimName: pihole-etc-longhorn-claim
-            - name: dnsmasq
-            persistentVolumeClaim:
-                claimName: pihole-dnsmasq-longhorn-claim
-
+    spec:
+    containers:
+    - name: pihole
+        image: pihole/pihole:latest
+        ...
+        volumeMounts:
+        - name: etc
+        mountPath: "/etc/pihole"
+        - name: dnsmasq
+        mountPath: "/etc/dnsmasq.d"
+    volumes:
+        - name: etc
+        persistentVolumeClaim:
+            claimName: pihole-etc-longhorn-claim
+        - name: dnsmasq
+        persistentVolumeClaim:
+            claimName: pihole-dnsmasq-longhorn-claim
+```
 
 ## Troubleshooting commands
 

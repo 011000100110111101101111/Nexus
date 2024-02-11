@@ -1,25 +1,19 @@
-# Installation on Ubuntu 
+# Ansible Installation
 
-### Install PIP
+### Ubuntu
+```bash
+# Install PIP
+sudo apt install python3-pip
 
-Ubuntu
+# Install Ansible
+python3 -m pip install --user ansible
 
-    sudo apt install python3-pip
+# If not on path, add with
+export PATH="$PATH:/wherever/it/installed"
+# Would be something like
+export PATH="$PATH:/usr/local/bin"
 
-### Install Ansible
-
-    python3 -m pip install --user ansible
-
-### If not on path, add with
-
-    export PATH="$PATH:/wherever/it/installed"
-
-Would be something like
-
-    export PATH="$PATH:/usr/local/bin"
-
-### Testing
-
-    ansible-playbook -i hosts.ini <playbook>
-
-    ansible all -i hosts.ini -m ping
+# Testing
+ansible-playbook -i hosts.ini <playbook>
+ansible all -i hosts.ini -m ping
+```

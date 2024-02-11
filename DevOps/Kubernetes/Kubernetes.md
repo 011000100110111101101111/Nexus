@@ -2249,14 +2249,21 @@ I am going to use `Calico` as my `Network Addon`. You can see a list of other av
 
 The following instructions are from `Calico` install [site](https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart). Reference them for future changes. Okay, lets start.
 
+Get the latest version
+
+```bash
+CALVER=$(curl -s https://api.github.com/repos/projectcalico/calico/releases/latest|grep tag_name|cut -d '"' -f 4)
+```
+
 Install Tigera Calico operator and custom resource definitions (BTW this is a `Namespace` kind.)
-
-    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/tigera-operator.yaml 
-
+```bash
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALVER}/manifests/tigera-operator.yaml 
+```
 Install custom resources (we need this for cidr change). (BTW this is an `Installation` kind.)
 
-    kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.3/manifests/custom-resources.yaml 
-
+```bash
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALVER}/manifests/custom-resources.yaml 
+```
 We need to change our CIDR range to what we set at the beginning, referenced [here](https://docs.tigera.io/calico-cloud/networking/ipam/initial-ippool). Change the cidr: line to what we made earlier.
 
     kubectl edit Installation default 
@@ -2316,7 +2323,9 @@ or with a command to do the above
 
 Now to install by manifests
 
-    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml 
+    MBLVER=$(curl -s https://api.github.com/repos/metallb/metallb/releases/latest|grep tag_name|cut -d '"' -f 4)
+
+    kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${MBLVER}/config/manifests/metallb-native.yaml 
 
 Now we need to configure IPAddressPool resource. Create a file called pool-1.yml and add the following contents (Adjust ip to what you want.) This is the IP range that will be accessible outside.
 
@@ -2406,11 +2415,24 @@ And test it. Get the EXTERNAL-IP of the service and then curl it.
     kubectl get svc web-app
     curl <EXTERNAL-IP> 
 
+### Installing Helm
+
+I will be using helm to install this, if you havent installed helm go [here](https://helm.sh/docs/intro/install/)
+
+Helm can be seen as a packaging component that allows 1 command to install numerous required manifests and resources.
+
+Go [here](https://github.com/helm/helm/releases) for checking versions.
+
+```bash
+wget https://get.helm.sh/helm-v3.14.0-linux-amd64.tar.gz
+sha256sum helm-v3.14.0-linux-amd64.tar.gz
+tar -zxvf helm-v3.14.0-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+```
+
 ### Installing nginx ingress controller
 
 Now, instead of using an IP, lets set up an ingress controller so we can use domain names.
-
-I will be using helm to install this, if you havent installed helm go [here](https://helm.sh/docs/intro/install/)
 
 The ingress controller i am using is [nginx ingress controller](https://docs.nginx.com/nginx-ingress-controller/installation/installing-nic/installation-with-helm/)
 

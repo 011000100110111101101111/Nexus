@@ -1,0 +1,10 @@
+- hosts: control_plane
+  become: yes
+  tasks:
+    - name: Install Calico
+      shell: |
+        VER=$(curl -s https://api.github.com/repos/projectcalico/calico/releases/latest|grep tag_name|cut -d '"' -f 4)
+        kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${VER}/manifests/tigera-operator.yaml
+        kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${VER}/manifests/custom-resources.yaml
+
+# TODO: Get this goin, and fix above, permission error to server auth

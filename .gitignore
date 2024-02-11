@@ -2,3 +2,4 @@ hosts.ini
 *.cert
 *.key
 *.crt
+*.deb*

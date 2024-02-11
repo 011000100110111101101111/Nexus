@@ -7,12 +7,12 @@
 
 ---
 - name: Copy SSH keys and configure sshd_config
-  hosts: all
+  hosts: localhost
   become: true
 
   # Global vars, change here
   vars:
-    current_user_name: "alex"
+    current_user_name: "k8smanager"
     ssh_password_authentication: "no"
     ssh_permit_empty_passwords: "no"
     ssh_use_pam: "yes"
