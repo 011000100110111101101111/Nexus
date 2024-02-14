@@ -17,7 +17,7 @@ jQuery.fn.getRepos = function (username) {
 
     this.append(`
     <div style="color: black; text-align: center; margin: 20% 0;">
-        🚧 Hold on tight, digging out ${username}'s repositories... 🚧 
+        🚧 Hold on tight, digging out ${username}'s repositories... 🚧
     </div>`
     );
 
@@ -32,8 +32,8 @@ jQuery.fn.getRepos = function (username) {
             filteredRepos["dotfiles"] = true;
             filteredRepos["homebrew-formulae"] = true;
             filteredRepos["ghportfolio"] = true;
-            filteredRepos["thundergolfer.github.io"] = true;
-            filteredRepos["thundergolfer"] = true;
+            filteredRepos["011000100110111101101111.github.io"] = true;
+            filteredRepos["011000100110111101101111"] = true;
             filteredRepos["golang-reactjs-skeleton-app"] = true;
             filteredRepos["bazel-python-mypy-protobuf"] = true;
             filteredRepos["arXie-Bot"] = true;
