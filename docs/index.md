@@ -3,10 +3,18 @@ layout: default
 tags: home
 ---
 
-# Welcome to my website
+# ⚙️ Welcome to my personal website!
 
-### I'm a college student with a focus in Cybersecurity
+This is where the majority of my project writeups find their home, as well as personal interests.
 
 <br>
 
-[**Projects →**]({{ site.baseurl }}/projects)
+
+<br>
+
+[**See latest blog posts →**]({{ site.baseurl }}/blog)
+
+<br>
+<br>
+
+#### Disclaimer: Credit to [thundergolfer](https://github.com/thundergolfer/thundergolfer.github.io/tree/main) for majority of the site, forked from his repo.

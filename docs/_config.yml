@@ -1,14 +1,19 @@
-title: Welcome to Nexus
+# Site settings
+title: Nexus
 author: Alex Sheehan
+description: "No hugs, some learning"
+baseurl: ""
+url: "https://www.nexus-core.dev"
 date_format: "%b %-d, %Y"
 
-
-remote_theme: pages-themes/cayman@v0.2.0
-plugins:
-- jekyll-remote-theme # add this line to the plugins list if you already have one
-- jekyll-paginate
-- jekyll-sitemap
-
+# Google services
+google_verification:
+# Use either direct GA implementation or set up GTM account
+# - using both will skew your data (leave blank to not use at all)
+google_analytics: UA-113168316-1
+google_tag_manager:
+# Bing services
+bing_verification:
 
 # Optional features
 show_related_posts: True
@@ -20,8 +25,11 @@ enable_mathjax: false
 extended_fonts: false
 enable_anchorjs: true
 
-github_username: 011000100110111101101111
-linkedin_username: Alexsheehan01
+# Social icons
+github_username: "011000100110111101101111"
+stackoverflow_id:
+twitter_username:
+linkedin_username: alexsheehan01
 
 text:
   pagination:
@@ -36,9 +44,19 @@ text:
   og_locale: "en_US"
 
 # Build settings
+markdown: kramdown
+redcarpet:
+  extensions: ["smart", "tables", "with_toc_data", "footnotes"]
 permalink: pretty
 paginate: 12
 paginate_path: "/blog/:num/"
+sass:
+  compressed: true
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+# https://github.com/jekyll/jekyll/issues/2938
+exclude: [vendor]
 
 collections_dir: collections
 collections:
