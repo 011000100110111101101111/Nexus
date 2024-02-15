@@ -22,11 +22,15 @@ IGNORED_AUTHORS = {
     "Neil Strauss",  # Eugh, bit gross
     "Christopher Paolini",  # Young Adult
     "Jeremy Clarkson",  # Blurgh
+    "Will Wight", # Too many books
+    "Rick Scott", # NO Isbns ...
+    "J.D. Franx", # More isbns issues
 }
 
 # For some reason Goodreads left out ISBN information for some of the books in my collection,
 # even though the ISBN info is available in Goodreads if you look up the data on their website.
 TITLE_TO_ISBN = {
+    "The Bands of Mourning (Mistborn, #6)": "1250862450",
     "China in Ten Words": "9780307739797",
     "Priestdaddy": "9780399573262",
     "The Man in the High Castle": "9780141186672",
@@ -110,6 +114,8 @@ TITLE_TO_ISBN = {
     "Between the World and Me": "9780812993547",
     "No One Is Talking About This": "9780593332542",
     "God Bless You, Mr. Rosewater": "9780440129295",
+    "A Clash of Fates (The Echoes Saga #9)": "9781916610088",
+
 }
 
 # Goodreads didn't allow 1/2 stars in ratings annoyingly, but I want to try them.
