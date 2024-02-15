@@ -12,6 +12,8 @@ To be more specific, I will cover deploying [Kubeadm](https://kubernetes.io/docs
 
 **Another consideration is this was all done on `ubuntu 22.04 LTS server` nodes**
 
+Throughout this writeup I will switch between referencing the control plane and master. They are interchangable, but if you are just starting then control plane is the most recent used reference for it.
+
 The topics we will cover consist of,
 
 - Pre-Installation Requirements
@@ -203,7 +205,7 @@ ON THE `CONTROL PLANE`
 
 Extremely important sidenote, this CIDR range **CANNOT** be in use on your network anywhere (accessible).
 
-Initiate the cluster with a pod-network. Considerations here are that the `pod-network-cidr` cannot be in use in the network anywhere else. The `control-plane-endpoint` can be either the hostname or the IP of the control plane, but if you use hostname it must be resolvable by dns (On the local network or in their hosts file like we set above.)
+Initiate the cluster with a cluster-network. Considerations here are that the `pod-network-cidr` cannot be in use in the network anywhere else. The `control-plane-endpoint` can be either the hostname or the IP of the control plane, but if you use hostname it must be resolvable by dns (On the local network or in their hosts file like we set above.)
 
 ```bash
 sudo kubeadm init --pod-network-cidr=10.10.0.0/16 --control-plane-endpoint=<hostname>
@@ -286,6 +288,107 @@ kubectl get nodes
 ```
 
 > You will notice it says `NotReady` for all 3, this is because we do not have a `CNI (Container Network Interface)` setup for the cluster. As a quick info sess, CNI handles the Pod-to-Pod communication. Read more [here](https://kubernetes.io/docs/concepts/services-networking/).
+
+## CNI Setup
+
+Now you can choose a CNI for the cluster. This will provide networking capabilities within the cluster.
+
+Some important considerations,
+
+- Do you need the ability to block traffic? (Ingress/Egress rules)
+- How many nodes do you need to support?
+
+I am going to use `Calico` as my `Network Addon`. You can see a list of other available ones [here](https://kubernetes.io/docs/concepts/cluster-administration/addons/). The one I am using is for `50 Nodes or Less`
+
+### Calico
+
+The following instructions are from `Calico` install [site](https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart). Reference them for future changes. Okay, lets start.
+
+Get the latest version
+
+```bash
+CALVER=$(curl -s https://api.github.com/repos/projectcalico/calico/releases/latest|grep tag_name|cut -d '"' -f 4)
+```
+
+Install Tigera Calico operator and custom resource definitions
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALVER}/manifests/tigera-operator.yaml
+```
+
+Install custom resources (we need this for CIDR change).
+
+```bash
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/${CALVER}/manifests/custom-resources.yaml
+```
+
+We need to change our CIDR range to what we set at the beginning, referenced [here](https://docs.tigera.io/calico-cloud/networking/ipam/initial-ippool). Change the cidr: line to what we made earlier when initializing the cluster.
+
+```bash
+kubectl edit Installation default
+```
+
+Check all the pods that are `Calico pods` are running with this. (Just keep it open till they all say **running** to confirm.)
+
+```bash
+watch kubectl get pods -n calico-system
+```
+
+### Flannel CNI
+
+The following instructions are from `Flannel` install [site](https://github.com/flannel-io/flannel). Reference them for future changes.
+
+Grab the manifest first, we need to change the podCIDR to whatever we set above
+
+```bash
+wget https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+```
+
+Search for the term `10.244.0.0/16` and change it to whatever CIDR range you did when initilizing the cluster. It should look like below
+
+```json
+net-conf.json: |
+{
+  "Network": "10.244.0.0/16",
+  "Backend": {
+    "Type": "vxlan"
+  }
+}
+```
+
+Finally just apply the manifest
+
+```bash
+kubectl apply -f kube-flannel.yml
+```
+
+---
+
+Cool, now we have a cluster with internal networking capabilities. We can deploy pods and run stuff normally, however there is some additions you will want to make. The first is a storage solution, also referred to as a CSI. This will provide a way to provision persistent storage from a `pooled` source. For example, NFS or Longhorn can be used here to provide a storage pool (As well as ceph and other storage solutions).
+
+See my posts on provisioning longhorn and nfs for kubernetes storage,
+
+- TODO nfs
+- TODO longhorn
+
+Another aspect you will want to tackle while on bare metal is the loadbalancer. In the cloud, this is usually abstracted from you, but on bare metal you need to implement it directly. A great solution for this is `metallb loadbalancer`.
+
+See my posts on setting up a bare metal loadbalancer,
+
+- TODO metallb
+
+If you want to create basic ingress (using a domain name compared to IP addresses), then you need to consider an ingress tool. There are many solutions for this, and I have personally found success with nginx ingress manager. Other options are traefik and HAproxy.
+
+See my posts on setting up basic ingress with nginx ingress manager or traefik,
+
+- TODO nginx ingress manager
+- TODO traefik
+
+If you want to tackle automatic certificate provisioning with your ingress then you should consider a certificate manager tool. A great example that I have had success with is `cert-manager` which works great with `nginx ingress manager`.
+
+See my posts on using cert-manager with nginx ingress manager to provision certificates for services,
+
+- TODO cert-manager
 
 ## Resources
 
