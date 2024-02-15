@@ -1,5 +1,29 @@
 [
     {
+        "title": "Behave: The Biology of Humans at Our Best and Worst",
+        "author": "Robert M. Sapolsky",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0143110918",
+        "review_path": null,
+        "year_i_finished_reading": null
+    },
+    {
+        "title": "A Wizard of Earthsea (Earthsea Cycle, #1)",
+        "author": "Ursula K. Le Guin",
+        "rating": "",
+        "isbn": "0553383043",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Assassin's Apprentice (Farseer Trilogy, #1)",
+        "author": "Robin Hobb",
+        "rating": "",
+        "isbn": "055357339X",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
         "title": "Wind and Truth (The Stormlight Archive, #5)",
         "author": "Brandon Sanderson",
         "rating": "",
@@ -32,146 +56,10 @@
         "year_i_finished_reading": null
     },
     {
-        "title": "A Wizard of Earthsea (Earthsea Cycle, #1)",
-        "author": "Ursula K. Le Guin",
-        "rating": "",
-        "isbn": "0553383043",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Assassin's Apprentice (Farseer Trilogy, #1)",
-        "author": "Robin Hobb",
-        "rating": "",
-        "isbn": "055357339X",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Winter's Heart (The Wheel of Time, #9)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "081257558X",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Crossroads of Twilight (The Wheel of Time, #10)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0312864590",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Knife of Dreams (The Wheel of Time, #11)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0812577566",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Gathering Storm (The Wheel of Time, #12)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765302306",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Towers of Midnight (The Wheel of Time, #13)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765325942",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "A Memory of Light (The Wheel of Time, #14)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765325950",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
         "title": "The Lost Metal (Mistborn, #7)",
         "author": "Brandon Sanderson",
         "rating": "",
         "isbn": "0765391198",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Rhythm of War (The Stormlight Archive, #4)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765326388",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Oathbringer (The Stormlight Archive, #3)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "076532637X",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Words of Radiance (The Stormlight Archive, #2)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765326361",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Path of Daggers (The Wheel of Time, #8)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0812550293",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "A Crown of Swords (The Wheel of Time, #7)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0812550285",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Lord of Chaos (The Wheel of Time, #6)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0812513754",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Fires of Heaven (The Wheel of Time, #5)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "1857232097",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Shadow Rising (The Wheel of Time, #4)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0812513738",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Dragon Reborn (The Wheel of Time #3)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0765305119",
         "review_path": null,
         "year_i_finished_reading": null
     }

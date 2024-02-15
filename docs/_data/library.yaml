@@ -1,5 +1,309 @@
 [
     {
+        "title": "CompTIA Security+ Get Certified Get Ahead: SY0-601 Study Guide",
+        "author": "Darril Gibson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "9798748708180",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Pentester BluePrint: Starting a Career as an Ethical Hacker",
+        "author": "Phillip L.  Wylie",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1119684307",
+        "review_path": null,
+        "year_i_finished_reading": "2022"
+    },
+    {
+        "title": "Basic Security Testing With Kali Linux, Third Edition",
+        "author": "Daniel W Dieterle",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1725031981",
+        "review_path": null,
+        "year_i_finished_reading": "2020"
+    },
+    {
+        "title": "Red Team Field Manual",
+        "author": "Ben Clark",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1494295504",
+        "review_path": null,
+        "year_i_finished_reading": "2022"
+    },
+    {
+        "title": "The Bands of Mourning (Mistborn, #6)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "Rhythm of War (The Stormlight Archive, #4)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765326388",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "Oathbringer (The Stormlight Archive, #3)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "076532637X",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "Shadows of Self (Mistborn, #5)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0765378558",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "Words of Radiance (The Stormlight Archive, #2)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765326361",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Alloy of Law (Mistborn, #4)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0765330423",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Hero of Ages (Mistborn, #3)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0765316897",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "Violent Python: A Cookbook for Hackers, Forensic Analysts, Penetration Testers and Security Engineers",
+        "author": "T.J. O'Connor",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1597499579",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Ghost in the Wires: My Adventures as the World's Most Wanted Hacker",
+        "author": "Kevin D. Mitnick",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0316037729",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Computer Organization and Design MIPS Edition: The Hardware/Software Interface (The Morgan Kaufmann Series in Computer Architecture and Design)",
+        "author": "David A. Patterson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0124077269",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Social Engineering: The Science of Human Hacking",
+        "author": "Christopher Hadnagy",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "111943338X",
+        "review_path": null,
+        "year_i_finished_reading": "2021"
+    },
+    {
+        "title": "A Memory of Light (The Wheel of Time, #14)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765325950",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Way of Kings (The Stormlight Archive, #1)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765326353",
+        "review_path": null,
+        "year_i_finished_reading": "2022"
+    },
+    {
+        "title": "Towers of Midnight (The Wheel of Time, #13)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765325942",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Shadow Rising (The Wheel of Time, #4)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0812513738",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "CompTIA Network+ Certification All-in-One Exam Guide, Eighth Edition (Exam N10-008) (CompTIA Network + All-In-One Exam Guide)",
+        "author": "Scott Jernigan",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1264269056",
+        "review_path": null,
+        "year_i_finished_reading": "2022"
+    },
+    {
+        "title": "Nine Things Successful People Do Differently",
+        "author": "Heidi Grant Halvorson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "1633694135",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
+        "title": "The Wise Man's Fear (The Kingkiller Chronicle, #2)",
+        "author": "Patrick Rothfuss",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0756404738",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Name of the Wind (The Kingkiller Chronicle, #1)",
+        "author": "Patrick Rothfuss",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "075640407X",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "City of Bones (The Mortal Instruments, #1)",
+        "author": "Cassandra Clare",
+        "rating": "\u2605\u2605",
+        "isbn": "1416914285",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Well of Ascension (Mistborn, #2)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "0765316889",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Eye of the World (The Wheel of Time, #1)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0812511816",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Gathering Storm (The Wheel of Time, #12)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765302306",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Wizard's First Rule (Sword of Truth, #1)",
+        "author": "Terry Goodkind",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0765346524",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Path of Daggers (The Wheel of Time, #8)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0812550293",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Knife of Dreams (The Wheel of Time, #11)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0812577566",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Lord of Chaos (The Wheel of Time, #6)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0812513754",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Winter's Heart (The Wheel of Time, #9)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "081257558X",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "A Crown of Swords (The Wheel of Time, #7)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0812550285",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Dragon Reborn (The Wheel of Time #3)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "0765305119",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Fires of Heaven (The Wheel of Time, #5)",
+        "author": "Robert Jordan",
+        "rating": "",
+        "isbn": "1857232097",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "Crossroads of Twilight (The Wheel of Time, #10)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0312864590",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Final Empire (Mistborn, #1)",
+        "author": "Brandon Sanderson",
+        "rating": "\u2605\u2605\u2605\u2605",
+        "isbn": "9780765311788",
+        "review_path": null,
+        "year_i_finished_reading": "2024"
+    },
+    {
+        "title": "The Great Hunt (The Wheel of Time #2)",
+        "author": "Robert Jordan",
+        "rating": "\u2605\u2605\u2605\u2605\u2605",
+        "isbn": "0812517725",
+        "review_path": null,
+        "year_i_finished_reading": "2023"
+    },
+    {
         "title": "Waybound (Cradle, #12)",
         "author": "Will Wight",
         "rating": "\u2605\u2605\u2605\u2605",
@@ -187,7 +491,7 @@
         "title": "Rise of the Ranger (The Echoes Saga, #1)",
         "author": "Philip C. Quaintrell",
         "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "9781916610002",
+        "isbn": "",
         "review_path": null,
         "year_i_finished_reading": "2023"
     },
@@ -195,112 +499,8 @@
         "title": "Confessor (Sword of Truth, #11)",
         "author": "Terry Goodkind",
         "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "9780765354303",
-        "review_path": null,
-        "year_i_finished_reading": "2023"
-    },
-    {
-        "title": "Wizard's First Rule (Sword of Truth, #1)",
-        "author": "Terry Goodkind",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765346524",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Wise Man's Fear (The Kingkiller Chronicle, #2)",
-        "author": "Patrick Rothfuss",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "0756404738",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Great Hunt (The Wheel of Time #2)",
-        "author": "Robert Jordan",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0812517725",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "City of Bones (The Mortal Instruments, #1)",
-        "author": "Cassandra Clare",
-        "rating": "\u2605\u2605",
-        "isbn": "1416914285",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Name of the Wind (The Kingkiller Chronicle, #1)",
-        "author": "Patrick Rothfuss",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "075640407X",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Bands of Mourning (Mistborn, #6)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
         "isbn": "",
         "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "Shadows of Self (Mistborn, #5)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "0765378558",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Alloy of Law (Mistborn, #4)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "0765330423",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Hero of Ages (Mistborn, #3)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "0765316897",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Well of Ascension (Mistborn, #2)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "0765316889",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Final Empire (Mistborn, #1)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605",
-        "isbn": "9780765311788",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Eye of the World (The Wheel of Time, #1)",
-        "author": "Robert Jordan",
-        "rating": "",
-        "isbn": "0812511816",
-        "review_path": null,
-        "year_i_finished_reading": null
-    },
-    {
-        "title": "The Way of Kings (The Stormlight Archive, #1)",
-        "author": "Brandon Sanderson",
-        "rating": "\u2605\u2605\u2605\u2605\u2605",
-        "isbn": "0765326353",
-        "review_path": null,
-        "year_i_finished_reading": null
+        "year_i_finished_reading": "2023"
     }
 ]

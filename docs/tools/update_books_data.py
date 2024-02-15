@@ -8,7 +8,6 @@ import json
 import pathlib
 import re
 import subprocess
-
 from typing import Optional
 
 #  I'll leave out children's authors, young-adult fiction, and bland fiction from what shows up on my website
@@ -147,14 +146,23 @@ def get_book_review_path(book_reviews_directory: pathlib.Path, title: str, autho
 
 
 if __name__ == "__main__":
-    repo_root = subprocess.run(
+
+    subdirectory = "/docs"
+
+    repo_root_full = subprocess.run(
         ["git", "rev-parse", "--show-toplevel"],
         capture_output=True,
         check=True,
     ).stdout.decode("utf-8").strip()
 
+    # Change this if you put everything in a subdirectory.
+    repo_root = repo_root_full + subdirectory
+
+    print(repo_root)
+
     book_reviews_directory = pathlib.Path(repo_root, "collections", "_reviews")
     reading_data_csv_path = pathlib.Path(repo_root, "_data", "goodreads_library_export.csv")
+
 
     entries = []
     with open(reading_data_csv_path, newline="") as csvfile:
