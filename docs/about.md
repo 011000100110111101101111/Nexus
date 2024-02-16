@@ -1,26 +1,29 @@
 ---
 layout: about
 permalink: /about/
-title: A little bit about me.
+title: A bit about me.
 tags: about
-headshot: /images/headshot.jpg
+headshot: /images/headshot.jpeg
 ---
 
-### Where I'm from
+I currently live in Salem, MA which is a town fairly close to Boston. I attend the University of Massachusetts Lowell,studying computer science with a focus in Cybersecurity, and am expected to be graduated this Spring, 2024.
 
--
+Hobbies 🆓⏳
 
-### What I do now
+- Reading 📚
+- Biking 🚵
+- Hiking 🥾
+- Home-labbing 💾
+- Writing to this website 🙂
 
--
+Extracurriculers 🎓
 
-### Where I'm at now
+- Collegiate Cyber Defense Compeitition (NECCDC)
+- Cybersecurity Club
 
-- 
+TODO: Add resume here
 
-
-
-<div id="stats" class="hidden">
+<!-- <div id="stats" class="hidden">
 
 <h3 id="dashboard"><code>#dashboard</code></h3>
 
@@ -36,7 +39,7 @@ headshot: /images/headshot.jpg
 
 <ol id="top-spotify-tracks"></ol>
 
-</div>
+</div> -->
 
 <!-- <script>
 /**
