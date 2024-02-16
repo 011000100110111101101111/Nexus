@@ -30,6 +30,17 @@ IGNORED_AUTHORS = {
 # For some reason Goodreads left out ISBN information for some of the books in my collection,
 # even though the ISBN info is available in Goodreads if you look up the data on their website.
 TITLE_TO_ISBN = {
+    "CompTIA Security+ Get Certified Get Ahead: SY0-601 Study Guide": "9798748708180",
+    "Confessor (Sword of Truth, #11)":"9780765354303",
+    "Rise of the Ranger (The Echoes Saga, #1)":"9781916610002",
+    "Empire of Dirt (The Echoes Saga, #2)": "9781916610019",
+    "Relic of the Gods (The Echoes Saga, #3)":"9781916610026",
+    "The Fall of Neverdark (The Echoes Saga, #4)":"9781916610033",
+    "Kingdom of Bones (The Echoes Saga, #5)":"9781916610040",
+    "Age of the King (The Echoes Saga, #6)":"9781916610057",
+    "The Knights of Erador (The Echoes Saga, #7)":"9781916610064",
+    "Last of the Dragorn (The Echoes Saga, #8)":"9781916610071",
+    "A Clash of Fates (The Echoes Saga #9)":"9781916610088",
     "The Bands of Mourning (Mistborn, #6)": "1250862450",
     "China in Ten Words": "9780307739797",
     "Priestdaddy": "9780399573262",
