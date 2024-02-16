@@ -8,6 +8,12 @@ headshot: /images/headshot.jpeg
 
 I currently live in Salem, MA which is a town fairly close to Boston. I'm currently enrolled at the University of Massachusetts Lowell, majoring in computer science with a focus on cybersecurity. I anticipate graduating this spring, and am excited to explore jobs in the DevOps / Cybersecurity world.
 
+A large interest of mine currently is the [**NECCDC**](https://neccdl.org/neccdc/). As the lead for orchestration I get to dive deeply into Kubernetes and ways to protect it. There is an active red team that has root access to your infrastructure and attacks you in real time during the compeition, and you must work closely with a team of 8 to secure your systems while completing randomly given "injects". Its super intense! We recently qualified and are going to compete in the regionals competition at Pace University in March.
+
+These are the qualified teams incase you are interested.
+
+![teams](images/neccdcteams.png)
+
 Hobbies 🆓⏳
 
 - Reading 📚
