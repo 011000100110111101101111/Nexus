@@ -1,4 +1,61 @@
 ---
+layout: post
+title: Automated Bare Metal Kubernetes deployment via ansible
+date: 2024-02-16
+summary: Kubernetes guide for deploying a cluster on bare metal automatically with ansible
+categories: orchestration devops kubernetes ansible
+---
+
+**Guide results**
+
+- 1 master node running on ubuntu
+- x worker nodes running on ubuntu
+- CNI deployed
+- Ability to add any amount of other services into script (CSI, ingress, etc)
+
+**Prerequisites**
+
+- Everything is tested and tuned for Ubuntu 22.04 LTS server
+  - If you want to use another os, there are various areas you will need to alter, but it is easily doable.
+- At least 2 machines as targets for the script (1 control plane, 1 worker).
+
+**Limitations**
+
+- Currently, the script does not support other operating systems than Ubuntu.
+- It also does not support more than 1 control plane.
+- However, both of these are pretty simple to implement, I simply have not had the time.
+
+There are two playbooks involved in this deployment. The first handles the base installation of the cluster, taking care of installing packages, configuring files, and initilizing the control plane and its workers. After this playbook is ran, you will have a working cluster with a CNI up and running.
+
+The second playbook handles the services you want to use. I have intentionally seperated this to allow script users to easily change what services they want to deploy onto the cluster. You can provision ingress, csi, vault, etc from this playbook.
+
+Lets now go over both playbooks so you can understand them better. If you just want to skip ahead and use them, the full playbooks are at the bottom of the post to copy.
+
+TODO: Describe playbooks section by section
+
+## Example inventory file
+
+This is an extremely basic inventory file where I am directly putting passwords in. The reason is this is deployed in my homelab, you would never want to do this in a real environment.
+
+Take note of the names at the start being IPS compared to hostnames, this is so the /etc/hosts file gets correctly updated for each host.
+
+```ini
+[masters]
+192.168.3.200 ansible_host=192.168.3.200 ansible_user=user ansible_ssh_pass=pass ansible_become=yes ansible_become_method=sudo ansible_become_pass=pass
+
+[workers]
+192.168.3.210 ansible_host=192.168.3.210 ansible_user=user ansible_ssh_pass=pass ansible_become=yes ansible_become_method=sudo ansible_become_pass=pass
+192.168.3.211 ansible_host=192.168.3.211 ansible_user=user ansible_ssh_pass=pass ansible_become=yes ansible_become_method=sudo ansible_become_pass=pass
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+```
+
+## Base Cluster Deployment Playbook
+
+```yaml
+---
 - hosts: all
   become: yes
   vars:
@@ -136,7 +193,6 @@
   become: yes # Run as root
   vars:
     user: user
-
   tasks:
     - name: Check if the master node is already initialized
       stat:
@@ -204,3 +260,64 @@
       command: "{{ hostvars['DUMMY_HOST']['JOIN_COMMAND'] }}"
       become: yes
       when: kubeadm_join.stat.exists == false # Only run if the worker node is not already joined
+```
+
+## Services Deployment Playbook
+
+```yaml
+- hosts: masters
+  become: yes # Run as root
+  vars:
+    user: user
+    metallbstart: "192.168.3.230"
+    metallbend: "192.168.3.240"
+  tasks:
+    - name: Prep Metallb
+      shell: |
+        kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+      become: yes
+      become_user: "{{ user }}"
+    - name: Install metallb
+      shell: |
+        MBLVER=$(curl -s https://api.github.com/repos/metallb/metallb/releases/latest|grep tag_name|cut -d '"' -f 4)
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${MBLVER}/config/manifests/metallb-native.yaml
+      become: yes
+      become_user: "{{ user }}"
+    - name: Configure metallb IP address pool
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: first-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+          - {{ metallbstart }}-{{ metallbend }}
+        EOF
+      become: yes
+      become_user: "{{ user }}"
+    - name: Configure metallb L2Advertisement
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: metallb-l2-advertisement
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+          - first-pool
+        EOF
+      become: yes
+      become_user: "{{ user }}"
+    - name: Rolling restart of metallb pods
+      command: kubectl rollout restart deployment controller -n metallb-system
+      become_user: "{{ user }}"
+      become: yes
+    # - name: Install Longhorn
+    #   command: kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+```

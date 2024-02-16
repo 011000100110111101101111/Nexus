@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Kubernetes Deployment on Bare Metal
+title: Kubernetes Deployment on Bare Metal Guide
 date: 2024-02-15
 summary: Kubernetes deployment to bare metal
-categories: orchestration devops
+categories: orchestration devops kubernetes
 ---
 
 We will discuss the deployment of kubernetes on bare metal machines. We will look into the considerations needed when using bare metal compared to cloud, as well as discussing the benefits of certain "plugins" compared to others. All of this comes from my research during implementing k8s in my homelab, as well as in the CCDC.
@@ -18,18 +18,17 @@ The topics we will cover consist of,
 
 - Pre-Installation Requirements
 - Deploying the cluster
+- Resources
+
+Suggested post-install topics include,
+
 - CNI setup
 - CSI setup
 - Loadbalancer setup
 - Ingress setup
 - Automated Deployment with Ansible
-- Resources
 
 ## Pre-Installation Requirements
-
-TODO: Finish up
-
-### Deploying Bare metal K8 cluster across 1 control and 2 worker nodes
 
 First disable Swap file.
 
