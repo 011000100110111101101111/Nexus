@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes Bare Metal Deployment via Ansible Guide
 date: 2024-02-16
 summary: Covers two ansible playbooks used to automatically deploy kubernetes cluster.
-categories: orchestration devops kubernetes ansible
+categories: automation ansible
 ---
 
 **Guide results**

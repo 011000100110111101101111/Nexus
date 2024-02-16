@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes Bare Metal Deployment Guide
 date: 2024-02-15
 summary: Covers a manual bare metal deployment.
-categories: orchestration devops kubernetes
+categories: orchestration kubernetes
 ---
 
 We will discuss the deployment of kubernetes on bare metal machines. We will look into the considerations needed when using bare metal compared to cloud, as well as discussing the benefits of certain "plugins" compared to others. All of this comes from my research during implementing k8s in my homelab, as well as in the CCDC.

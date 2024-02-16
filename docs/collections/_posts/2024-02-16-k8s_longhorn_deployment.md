@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes Longhorn Deployment Guide
 date: 2024-02-16
 summary: Covers deploying and setting up longhorn via helm or manually
-categories: orchestration devops Kubernetes
+categories: storage kubernetes longhorn
 ---
 
 This guide will cover deploying longhorn across all your nodes in the cluster, pooling their storage and allowing them to be accessible via a PVC. We can also set longhorn as the default storageclass, making helm installations extremely easy.
