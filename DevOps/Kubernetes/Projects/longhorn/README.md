@@ -54,10 +54,17 @@ kubectl get pods --namespace longhorn-system --watch
 ```
 
 ### (Optional) Setting longhorn as default CSI
-TODO: Had no internet
 
+```bash
+# TO mark it as default
+kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+
+# TO unmark it as default
+kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+```
 
 ### Testing
+
 To test this, create a PVC using the storageClassName longhorn.
 
 ```yaml
@@ -69,12 +76,14 @@ namespace: homelab
 spec:
 storageClassName: longhorn
 accessModes:
-    - ReadWriteOnce
+  - ReadWriteOnce
 resources:
-    requests:
-    storage: 5Gi
+  requests:
+  storage: 5Gi
 ```
+
 Then, claim it for a deployment under volumes,
+
 ```yaml
 spec:
 replicas: 1
@@ -107,4 +116,3 @@ template:
 ## Troubleshooting commands
 
 ## Troubleshooting Topics
-

@@ -21,8 +21,6 @@ Extracurriculers 🎓
 - Collegiate Cyber Defense Compeitition (NECCDC)
 - Cybersecurity Club
 
-TODO: Add resume here
-
 <!-- <div id="stats" class="hidden">
 
 <h3 id="dashboard"><code>#dashboard</code></h3>
@@ -59,7 +57,7 @@ function populateDashboardHTML(data) {
     data.spotify.forEach(track => {
         topSpotifyTracksList.appendChild(htmlToElement(`
             <li>
-                <a target="_blank" rel="noopener noreferrer" href="${track.link}"><strong>${track.name}</strong></a> 
+                <a target="_blank" rel="noopener noreferrer" href="${track.link}"><strong>${track.name}</strong></a>
                 <p>${track.artist}</p>
             </li>
         `));
@@ -100,7 +98,7 @@ fetch('https://thundergolfer-cgflgpx.modal.run')
 <style>
 #stats {
   background-color: #f7f7f9;
-  border-radius: 1rem; 
+  border-radius: 1rem;
   padding: 1.5em;
   margin-top: 2.5em;
 }
@@ -192,7 +190,7 @@ fetch('https://thundergolfer-cgflgpx.modal.run')
     flex-direction: column;
     align-items: center;
   }
-  
+
   .cover-container, .book-info {
     display: flex;
     flex-direction: column;
