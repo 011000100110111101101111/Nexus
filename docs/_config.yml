@@ -1,7 +1,7 @@
 # Site settings
 title: Nexus
 author: Alex Sheehan
-description: "No hugs, some learning"
+description: "Always learning"
 baseurl: ""
 url: "https://www.nexus-core.dev"
 date_format: "%b %-d, %Y"
