@@ -6,7 +6,7 @@ tags: about
 headshot: /images/headshot.jpeg
 ---
 
-I currently live in Salem, MA which is a town fairly close to Boston. I attend the University of Massachusetts Lowell,studying computer science with a focus in Cybersecurity, and am expected to be graduated this Spring, 2024.
+I currently live in Salem, MA which is a town fairly close to Boston. I'm currently enrolled at the University of Massachusetts Lowell, majoring in computer science with a focus on cybersecurity. I anticipate graduating this spring, and am excited to explore jobs in the DevOps / Cybersecurity world.
 
 Hobbies 🆓⏳
 
