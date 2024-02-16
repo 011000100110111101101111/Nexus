@@ -1,0 +1,57 @@
+- hosts: masters
+  become: yes # Run as root
+  vars:
+    user: user
+    metallbstart: "192.168.3.230"
+    metallbend: "192.168.3.240"
+  tasks:
+    - name: Prep Metallb
+      shell: |
+        kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
+      become: yes
+      become_user: "{{ user }}"
+    - name: Install metallb
+      shell: |
+        MBLVER=$(curl -s https://api.github.com/repos/metallb/metallb/releases/latest|grep tag_name|cut -d '"' -f 4)
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${MBLVER}/config/manifests/metallb-native.yaml
+      become: yes
+      become_user: "{{ user }}"
+    - name: Configure metallb IP address pool
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: first-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+          - {{ metallbstart }}-{{ metallbend }}
+        EOF
+      become: yes
+      become_user: "{{ user }}"
+    - name: Configure metallb L2Advertisement
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: metallb-l2-advertisement
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+          - first-pool
+        EOF
+      become: yes
+      become_user: "{{ user }}"
+    - name: Rolling restart of metallb pods
+      command: kubectl rollout restart deployment controller -n metallb-system
+      become_user: "{{ user }}"
+      become: yes
+    # - name: Install Longhorn
+    #   command: kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+
+#TODO: Add longhorn, nginx ingress controller, cert-manager
