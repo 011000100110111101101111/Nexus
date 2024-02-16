@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Kubernetes Longhorn Deployment
+title: Kubernetes Longhorn Deployment Guide
 date: 2024-02-16
-summary: Kubernetes guide for deploying longhorn on Kubernetes
+summary: Covers deploying and setting up longhorn via helm or manually
 categories: orchestration devops Kubernetes
 ---
 

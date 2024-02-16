@@ -1,8 +1,8 @@
 ---
 layout: post
-title: Kubernetes Deployment on Bare Metal Guide
+title: Kubernetes Bare Metal Deployment Guide
 date: 2024-02-15
-summary: Kubernetes deployment to bare metal
+summary: Covers a manual bare metal deployment.
 categories: orchestration devops kubernetes
 ---
 
