@@ -13,14 +13,11 @@ categories: automation ansible
 - CNI deployed
 - Ability to add any amount of other services into script (CSI, ingress, etc)
 
-**Prerequisites**
+**Prerequisites / Important Information**
 
 - Everything is tested and tuned for Ubuntu 22.04 LTS server
   - If you want to use another os, there are various areas you will need to alter, but it is easily doable.
 - At least 2 machines as targets for the script (1 control plane, 1 worker).
-
-**Limitations**
-
 - Currently, the script does not support other operating systems than Ubuntu.
 - It also does not support more than 1 control plane.
 - However, both of these are pretty simple to implement, I simply have not had the time.

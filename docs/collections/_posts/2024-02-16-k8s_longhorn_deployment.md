@@ -3,25 +3,19 @@ layout: post
 title: Kubernetes Longhorn Deployment Guide
 date: 2024-02-16
 summary: Covers deploying and setting up longhorn via helm or manually
-categories: storage kubernetes longhorn
+categories: orchestration kubernetes
 ---
 
-This guide will cover deploying longhorn across all your nodes in the cluster, pooling their storage and allowing them to be accessible via a PVC. We can also set longhorn as the default storageclass, making helm installations extremely easy.
+**Guide results**
 
-Sidenote: Longhorn is a great solution when running a baremetal Kubernetes cluster and you want to have local storage available for all the nodes and useable by statefulsets (databases). However, it is not necessarily needed if you already have a NFS solution or some other provided csi, especially when in a cloud environment where you have access to more integrated storage solutions.
+- This guide will cover deploying longhorn across all your nodes in the cluster, pooling their storage and allowing them to be accessible via a PVC. We can also set longhorn as the default storageclass, making helm installations extremely easy.
 
-Open Ports
+**Prerequisites / Important Information**
 
-- If wanting to use UI dashboard requires ingress via port 80
-
-Included Files
-
-- longhorn-ingress.yml
-  - This is for the longhorn dashboard. The ingress is set up to use cert-manager via a clusterissuer.
-
-Known Requirements
-
+- Sidenote: Longhorn is a great solution when running a baremetal Kubernetes cluster and you want to have local storage available for all the nodes and useable by statefulsets (databases). However, it is not necessarily needed if you already have a NFS solution or some other provided csi, especially when in a cloud environment where you have access to more integrated storage solutions.
+- The included file longhorn-ingress.yml is for the longhorn dashboard. The ingress is set up to use cert-manager via a clusterissuer.
 - Base VMS/Machines MUST have enough space or you will run into disk pressure errors. I found 30GB free+ worked.
+- If wanting to use UI dashboard requires ingress via port 80
 
 ### Installing via Helm
 

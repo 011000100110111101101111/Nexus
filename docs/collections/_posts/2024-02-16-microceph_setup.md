@@ -12,7 +12,7 @@ The microceph package makes setting up a cluster easier. It includes numerous de
 
 - ceph cluster deployed across 3 nodes allowing simple HA storage
 
-**Prerequisites**
+**Prerequisites / Important Information**
 
 - Everything is done on Ubuntu 22.04 LTS server.
 - You must have atleast 3 nodes.
