@@ -264,17 +264,21 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 ```yaml
 - hosts: masters
   become: yes # Run as root
+  # TODO: Remove redundant commands
   vars:
     user: user
     metallbstart: "192.168.3.230"
     metallbend: "192.168.3.240"
   tasks:
+    - name: Install Helm
+      command: sudo snap install helm --classic
+      become: yes
     - name: Prep Metallb
       shell: |
         kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
       become: yes
       become_user: "{{ user }}"
-    - name: Install metallb
+    - name: Install Metallb
       shell: |
         MBLVER=$(curl -s https://api.github.com/repos/metallb/metallb/releases/latest|grep tag_name|cut -d '"' -f 4)
         kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/${MBLVER}/config/manifests/metallb-native.yaml
@@ -312,9 +316,28 @@ ansible_ssh_common_args='-o StrictHostKeyChecking=no'
       command: kubectl rollout restart deployment controller -n metallb-system
       become_user: "{{ user }}"
       become: yes
-    # - name: Install Longhorn
-    #   command: kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.5.3/deploy/longhorn.yaml
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: longhorn
+        repo_url: https://charts.longhorn.io
+    - name: Install Longhorn
+      kubernetes.core.helm:
+        name: longhorn
+        chart_ref: longhorn/longhorn
+        namespace: longhorn-system
+      become: yes
+      become_user: "{{ user }}"
+    - name: Install NGINX Ingress controller
+      kubernetes.core.helm_repository:
+        name: ingress-nginx
+        repo_url: https://kubernetes.github.io/ingress-nginx
+      become: yes
+      become_user: "{{ user }}"
+    - name: Install NGINX Ingress controller
+      kubernetes.core.helm:
+        name: ingress-nginx
+        chart_ref: ingress-nginx/ingress-nginx
+        namespace: ingress-nginx
+      become: yes
+      become_user: "{{ user }}"
 ```

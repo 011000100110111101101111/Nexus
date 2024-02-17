@@ -1,0 +1,41 @@
+# ---
+# - hosts: all
+#   become: yes
+#   tasks:
+#     - name: List GPG Keys in trusted.gpg keyring
+#       command: "gpg --no-default-keyring --keyring /etc/apt/trusted.gpg --list-keys"
+#       register: gpg_keys
+
+#     - name: Extract Docker GPG Key ID
+#       set_fact:
+#         docker_gpg_key_id: "{{ gpg_keys.stdout_lines | regex_search('(\\w{8})').matches.0 }}"
+#       when: gpg_keys.stdout_lines | regex_search('(\\w{8})').matches | length > 0
+#       environment:
+#         GNUPGHOME: /etc/apt
+
+- hosts: all
+  become: yes
+  tasks:
+    # - name: Remove Docker GPG Key
+    #   command: "gpg --no-default-keyring --keyring /etc/apt/trusted.gpg --delete-key {{ docker_gpg_key_id }}"
+    #   when: docker_gpg_key_id is defined
+
+    - name: Purge Docker Configurations
+      shell: |
+        sudo rm -rf /etc/apt/sources.list.d/docker.list
+        sudo rm -rf /etc/apt/trusted.gpg.d/docker.gpg
+        sudo rm -rf /etc/apt/keyrings/docker.gpg
+        sudo apt clean -y
+        sudo apt-get remove docker docker-engine docker.io containerd runc -y
+        sudo apt-get purge docker-ce docker-ce-cli containerd.io -y
+        sudo apt-get autoclean -y
+        sudo apt-get autoremove -y
+        sudo apt-get update -y
+
+# Notes
+# TODO Integrate this
+
+# List gpg key
+# gpg --no-default-keyring --keyring /etc/apt/trusted.gpg --list-keys
+# Delete gpg key
+# sudo gpg --no-default-keyring --keyring /etc/apt/trusted.gpg --delete-key <DOCKER_GPG_KEY>

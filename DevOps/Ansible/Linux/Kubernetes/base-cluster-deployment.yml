@@ -151,7 +151,7 @@
         state: directory
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: 0755
+        mode: 0600
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
     - name: Copy the kube config file
       copy:
