@@ -105,4 +105,4 @@ serverTelemetry:
 ui:
   enabled: true
   serviceType: "LoadBalancer"
-  #loadBalancerIP: 10.35.40.122
+  loadBalancerIP: 10.35.40.122

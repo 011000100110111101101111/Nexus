@@ -21,11 +21,17 @@
     - name: Disable Swap File
       shell: swapoff -a
 
+    - name: Check if /etc/fstab file exists
+      stat:
+        path: /etc/fstab
+      register: fstab_file
+
     - name: Remove Swap file from /etc/fstab
       replace:
         path: /etc/fstab
         regexp: ".*swap.*"
         replace: ""
+      when: fstab_file.stat.exists
 
     - name: Create /etc/modules-load.d/k8s.conf for all worker nodes
       copy:
@@ -151,7 +157,7 @@
         state: directory
         owner: "{{ user }}"
         group: "{{ user }}"
-        mode: 0600
+        mode: 0744
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
     - name: Copy the kube config file
       copy:
@@ -194,13 +200,15 @@
 # Ansible playbook to join the worker nodes to the cluster
 - hosts: workers
   become: yes # Run as root
-
   tasks:
     - name: Check if the worker node is already joined
       stat:
         path: /etc/kubernetes/kubelet.conf
-      register: kubeadm_join
+      register: kubeadm_already_joined
+    - name: Debug Information
+      debug:
+        var: hostvars['DUMMY_HOST']
     - name: Join the worker nodes to the cluster
       command: "{{ hostvars['DUMMY_HOST']['JOIN_COMMAND'] }}"
       become: yes
-      when: kubeadm_join.stat.exists == false # Only run if the worker node is not already joined
+      when: kubeadm_already_joined.stat.exists == false # Only run if the worker node is not already joined

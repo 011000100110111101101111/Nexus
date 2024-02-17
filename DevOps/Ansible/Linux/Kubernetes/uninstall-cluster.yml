@@ -1,12 +1,14 @@
 ---
 - hosts: all
   become: yes
+  vars:
+    current_user_name: user
   tasks:
     - name: Uninstall stuff
       shell: |
         sudo kubeadm reset --force
         sudo apt-get purge --allow-change-held-packages -y kubeadm kubectl kubelet kubernetes-cni
-        rm -rf ~/.kube
+        rm -rf /home/{{ current_user_name | default(ansible_env.USER) }}/.kube
         rm -rf /etc/cni /etc/kubernetes /var/lib/dockershim /var/lib/etcd /var/lib/kubelet /var/lib/etcd2/ /var/run/kubernetes ~/.kube/*
         rm -rf /var/lib/docker /etc/docker /var/run/docker.sock
         rm -f /etc/apparmor.d/docker /etc/systemd/system/etcd*
