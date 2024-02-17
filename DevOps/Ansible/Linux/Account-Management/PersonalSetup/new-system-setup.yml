@@ -26,6 +26,7 @@
       - vim
       - zoxide
       - thefuck
+      - fzf
     specific_package_list_ubuntu:
       - git
     specific_package_list_centos:
