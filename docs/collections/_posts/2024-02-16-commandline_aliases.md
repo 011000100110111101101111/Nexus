@@ -36,5 +36,5 @@ alias kpodsshort='kubectl get pods -A --no-headers | awk "{print \$2, \$1}" | fz
 This doozy will allow you to interactively and visually choose a ansible playbook then choose an inventory file for it, then execute it. This requires `fzf` package to be installed on the system. You can change ./ to always search certain directories on your system, or search the entire directory, etc. Currently it searches the current directory and any subdirectores.
 
 ```bash
-alias run-ansible='find ./ -type f -name "*.yml" -printf "%P\n" | fzf --multi --ansi --preview "cat {}" --preview-window=right:60%:wrap | awk "{print \$1}" | xargs -I {} sh -c 'echo {} && find ./ -type f -name "*.ini" -printf "%P\n" | fzf --ansi --preview "cat {}" --preview-window=right:60%:wrap' | xargs -n 2 sh -c "ansible-playbook \$0 -i \$1"'
+alias run-ansible='find ./ -type f -name "*.yml" -printf "%P\n" | fzf --multi --ansi --preview "cat {}" --preview-window=right:60%:wrap | awk "{print \$1}" | xargs -I {} sh -c '\''echo {} && find ./ -type f -name "*.ini" -printf "%P\n" | fzf --ansi --preview "cat {}" --preview-window=right:60%:wrap'\'' | xargs -n 2 sh -c "ansible-playbook \$0 -i \$1"'
 ```
