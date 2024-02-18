@@ -19,6 +19,8 @@ The microceph package makes setting up a cluster easier. It includes numerous de
 
 ## Cluster Deployment
 
+Install microceph on all the nodes you want to run it on.
+
 ```bash
 sudo snap install microceph
 ```
@@ -111,7 +113,7 @@ Okay, we have the disk setup, now we need to create a pool.
 sudo microceph.ceph osd pool create kubernetes-pool
 ```
 
-- osd = Your disks that you just added. If you check .ceph output you can see the osd under services.
+- osd = Your type (disks) that you just added. If you check .ceph output you can see the osd under services.
 - pool = type
 - create = action to do, create the pool
 - kubernetes-pool = name of pool, change to what you want
@@ -136,7 +138,7 @@ tes-pool
 - data-disk1 = disk name
 - --size 2GB = 2GB of space
 - --image-feature layering =
-- -k = keyring file, (sudo find / -name "ceph.keyring")
+- -k = keyring file, (sudo find / -name ceph.keyring)
 - -p = pool to run this on
 
 ## Accessing the cluster from an outside system
@@ -188,7 +190,7 @@ sudo ceph status
 After creating these two files, we can now make use of the cluster. Lets mount one of the disks we created above from the kubernetes pool. We want to create an entry in rdbmap to mount this.
 
 ```bash
-sudo vim /etc/ceph/rdbmap
+sudo vim /etc/ceph/rbdmap
 ```
 
 Below is an example of what you would enter.
