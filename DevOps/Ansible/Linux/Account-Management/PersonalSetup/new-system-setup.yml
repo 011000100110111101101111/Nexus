@@ -7,12 +7,12 @@
 
 ---
 - name: Copy SSH keys and configure sshd_config
-  hosts: localhost
+  hosts: all
   become: true
 
   # Global vars, change here
   vars:
-    current_user_name: "k8smanager"
+    current_user_name: "alex"
     ssh_password_authentication: "no"
     ssh_permit_empty_passwords: "no"
     ssh_use_pam: "yes"
@@ -33,11 +33,11 @@
       - git
 
   tasks:
-    - name: Copy SSH public key
-      authorized_key:
-        user: "{{current_user_name}}"
-        key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
-        state: present
+    # - name: Copy SSH public key
+    #   authorized_key:
+    #     user: "{{current_user_name}}"
+    #     key: "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
+    #     state: present
 
     - name: Remove all lines from sshd_config
       lineinfile:
