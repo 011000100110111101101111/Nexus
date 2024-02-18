@@ -14,6 +14,8 @@ categories: programming aliases
 
 - None
 
+---
+
 This is where I will collect aliases I find useful for different purposes. I will try my best to credit others when I have found it somewhere. This will also constantly be updated as I find / create more.
 
 ## Kubernetes

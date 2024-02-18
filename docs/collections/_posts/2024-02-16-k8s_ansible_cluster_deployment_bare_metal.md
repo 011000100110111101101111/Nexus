@@ -22,6 +22,8 @@ categories: automation ansible
 - It also does not support more than 1 control plane.
 - However, both of these are pretty simple to implement, I simply have not had the time.
 
+---
+
 There are two playbooks involved in this deployment. The first handles the base installation of the cluster, taking care of installing packages, configuring files, and initilizing the control plane and its workers. After this playbook is ran, you will have a working cluster with a CNI up and running.
 
 The second playbook handles the services you want to use. I have intentionally seperated this to allow script users to easily change what services they want to deploy onto the cluster. You can provision ingress, csi, vault, etc from this playbook.

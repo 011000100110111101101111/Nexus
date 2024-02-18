@@ -15,6 +15,8 @@ categories: security
 - Have a proxmox machine running
 - Have atleast 1 yubikey
 
+---
+
 First, go to [yubikeys getapikey site](upgrade.yubico.com/getapikey/).
 
 Put in your email and then press your yubikey for the YubiKey OTP field. This will allow you to use the yubikey web services for authentication and link it to your yubikey.
