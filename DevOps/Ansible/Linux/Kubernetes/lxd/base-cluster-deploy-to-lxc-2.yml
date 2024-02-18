@@ -1,5 +1,11 @@
 - hosts: all
   become: yes
+  vars:
+    # Must container master in the name
+    control_plane: "kmaster"
+    worker_prefix: "kworker"
+    number_of_workers: 3
+  gather_facts: false
   tasks:
     - name: Copy over script
       copy:
@@ -87,3 +93,51 @@
           fi
         dest: /tmp/kubernetes_setup_script.sh
         mode: "0755"
+
+    - name: Create LXD container controller
+      lxd_container:
+        name: "{{ control_plane }}"
+        ignore_volatile_options: true
+        state: started
+        source:
+          type: image
+          mode: pull
+          protocol: simplestreams
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/22.04/cloud
+        wait_for_container: true
+        wait_for_ipv4_addresses: true
+        profiles:
+          - k8s-config
+
+    - name: Create LXD container
+      lxd_container:
+        name: "{{ item }}"
+        ignore_volatile_options: true
+        state: started
+        source:
+          type: image
+          mode: pull
+          protocol: simplestreams
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/22.04/cloud
+        wait_for_container: true
+        wait_for_ipv4_addresses: true
+        profiles:
+          - k8s-config
+        #target: "{{ item.node }}"
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    # - name: Initiate cluster setup on controller (Must occur first)
+    #   shell:
+    #     cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
+
+    # - name: Initiate cluster setup on workers
+    #   shell:
+    #     cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ item }} bash
+    #   loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    # - name: Delete a file
+    #   file:
+    #     path: /tmp/kubernetes_setup_script.sh
+    #     state: absent

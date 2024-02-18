@@ -1,0 +1,19 @@
+- hosts: all
+  become: yes
+  vars:
+    control_plane: "kmaster"
+    worker_prefix: "kworker"
+    number_of_workers: 3
+  gather_facts: false
+  tasks:
+    - name: Delete LXD container controller
+      lxd_container:
+        name: "{{ control_plane }}"
+        state: absent
+        type: container
+    - name: Delete LXD container workers
+      lxd_container:
+        name: "{{ item }}"
+        state: absent
+        type: container
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
