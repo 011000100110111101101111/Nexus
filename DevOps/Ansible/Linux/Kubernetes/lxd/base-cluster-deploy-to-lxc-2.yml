@@ -3,10 +3,32 @@
   vars:
     # Must container master in the name
     control_plane: "kmaster"
+    # Worker names, kworker-1 , kworker-2, kworker-3, ... kworker-{{ number_of_workers }}
     worker_prefix: "kworker"
     number_of_workers: 3
-  gather_facts: false
   tasks:
+    - name: Create /etc/modules-load.d/k8s.conf for all worker nodes
+      copy:
+        content: |
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/k8s.conf
+
+    - name: Load the modules
+      shell:
+        cmd: sudo modprobe overlay && sudo modprobe br_netfilter
+
+    - name: Configure kernel parameters for all nodes
+      copy:
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+        dest: /etc/sysctl.d/k8s.conf
+
+    - name: Apply the changes
+      shell:
+        cmd: sudo sysctl --system
     - name: Copy over script
       copy:
         content: |
@@ -21,12 +43,6 @@
           apt-get install -qq -y net-tools curl ssh software-properties-common >/dev/null
 
           echo "[TASK 1.5] Install containerd runtime"
-          cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf \
-          overlay
-          br_netfilter
-          EOL
-          modprobe overlay
-          modprobe br_netfilter
           cat <<EOL | sudo tee /etc/sysctl.d/k8s.conf
           net.bridge.bridge-nf-call-iptables  = 1
           net.bridge.bridge-nf-call-ip6tables = 1
@@ -72,9 +88,6 @@
 
           if [[ $(hostname) =~ .*master.* ]]
           then
-
-            echo "[TASK 7] Pull required containers"
-            kubeadm config images pull >/dev/null 2>&1
 
             echo "[TASK 8] Initialize Kubernetes Cluster"
             kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all >> /root/kubeinit.log 2>&1
@@ -141,16 +154,40 @@
         #target: "{{ item.node }}"
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
-    # - name: Initiate cluster setup on controller (Must occur first)
-    #   shell:
-    #     cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
+    - name: Copy boot to LXC control (Weird issue)
+      shell: |
+        lxc file push /boot/config-5.15.0-94-generic  {{ control_plane }}/boot/
+        lxc config set {{ control_plane }} security.privileged true
+        lxc config set {{ control_plane }} security.nesting true
 
-    # - name: Initiate cluster setup on workers
-    #   shell:
-    #     cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ item }} bash
-    #   loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+    - name: Copy boot to LXC workers (Weird issue)
+      shell: |
+        lxc file push /boot/config-5.15.0-94-generic  {{ item }}/boot/
+        lxc config set {{ item }} security.privileged true
+        lxc config set {{ item }} security.nesting true
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
-    # - name: Delete a file
-    #   file:
-    #     path: /tmp/kubernetes_setup_script.sh
-    #     state: absent
+    - name: Restart controller
+      lxd_container:
+        name: "{{ control_plane }}"
+        state: restarted
+
+    - name: Restart workers
+      lxd_container:
+        name: "{{ item }}"
+        state: restarted
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Initiate cluster setup on controller (Must occur first)
+      shell:
+        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
+
+    - name: Initiate cluster setup on workers
+      shell:
+        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ item }} bash
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Delete a file
+      file:
+        path: /tmp/kubernetes_setup_script.sh
+        state: absent
