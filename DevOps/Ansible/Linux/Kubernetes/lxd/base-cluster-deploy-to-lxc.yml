@@ -3,138 +3,44 @@
   vars:
     # Must container master in the name
     control_plane: "kmaster"
+    # Worker names, kworker-1 , kworker-2, kworker-3, ... kworker-{{ number_of_workers }}
     worker_prefix: "kworker"
     number_of_workers: 3
-  gather_facts: false
   tasks:
-    - name: Copy over script
+    - name: Create /etc/modules-load.d/k8s.conf for all worker nodes
       copy:
         content: |
-          #!/bin/bash
+          overlay
+          br_netfilter
+        dest: /etc/modules-load.d/k8s.conf
 
-          # This script has been tested on Ubuntu 22.04
-          # For other versions of Ubuntu, you might need some tweaking
+    - name: Load the modules
+      shell:
+        cmd: sudo modprobe overlay && sudo modprobe br_netfilter
 
-          echo "[TASK 1] Install essential packages"
-          export DEBIAN_FRONTEND=noninteractive
-          apt-get update -qq >/dev/null
-          apt-get install -qq -y net-tools curl ssh software-properties-common >/dev/null
+    - name: Configure kernel parameters for all nodes
+      copy:
+        content: |
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+        dest: /etc/sysctl.d/k8s.conf
 
-          echo "[TASK 2] Install containerd runtime"
-          apt-get install -qq -y apt-transport-https ca-certificates curl gnupg lsb-release >/dev/null
-          mkdir -p /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          echo \
-            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-            $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
-          apt-get update -qq >/dev/null
-          apt-get install -qq -y containerd.io >/dev/null
-          containerd config default > /etc/containerd/config.toml
-          sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
-          systemctl restart containerd
-          systemctl enable containerd >/dev/null
-
-          echo "[TASK 3] Set up kubernetes repo"
-          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' > /etc/apt/sources.list.d/kubernetes.list
-
-          echo "[TASK 4] Install Kubernetes components (kubeadm, kubelet and kubectl)"
-          apt-get update -qq >/dev/null
-          apt-get install -qq -y kubeadm kubelet kubectl >/dev/null
-          echo 'KUBELET_EXTRA_ARGS="--fail-swap-on=false"' > /etc/default/kubelet
-          systemctl restart kubelet
-
-          echo "[TASK 5] Enable ssh password authentication"
-          sed -i 's/^PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config
-          echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
-          systemctl reload sshd
-
-          echo "[TASK 6] Set root password"
-          echo -e "kubeadmin\nkubeadmin" | passwd root >/dev/null 2>&1
-          echo "export TERM=xterm" >> /etc/bash.bashrc
-
-          #######################################
-          # To be executed only on master nodes #
-          #######################################
-
-          if [[ $(hostname) =~ .*master.* ]]
-          then
-
-            echo "[TASK 7] Pull required containers"
-            kubeadm config images pull >/dev/null 2>&1
-
-            echo "[TASK 8] Initialize Kubernetes Cluster"
-            kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=all >> /root/kubeinit.log 2>&1
-
-            echo "[TASK 9] Copy kube admin config to root user .kube directory"
-            mkdir /root/.kube
-            cp /etc/kubernetes/admin.conf /root/.kube/config
-
-            echo "[TASK 10] Deploy Calico network"
-
-            kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-
-            echo "[TASK 11] Generate and save cluster join command to /joincluster.sh"
-            joinCommand=$(kubeadm token create --print-join-command 2>/dev/null)
-            echo "$joinCommand --ignore-preflight-errors=all" > /joincluster.sh
-
-          fi
-
-          #######################################
-          # To be executed only on worker nodes #
-          #######################################
-
-          if [[ $(hostname) =~ .*worker.* ]]
-          then
-            echo "[TASK 7] Join node to Kubernetes Cluster"
-            apt install -qq -y sshpass >/dev/null 2>&1
-            sshpass -p "kubeadmin" scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no kmaster.lxd:/joincluster.sh /joincluster.sh 2>/tmp/joincluster.log
-            bash /joincluster.sh >> /tmp/joincluster.log 2>&1
-          fi
-        dest: /tmp/kubernetes_setup_script.sh
-        mode: "0755"
+    - name: Apply the changes
+      shell:
+        cmd: sudo sysctl --system
 
     - name: Create LXD container controller
-      lxd_container:
-        name: "{{ control_plane }}"
-        ignore_volatile_options: true
-        state: started
-        source:
-          type: image
-          mode: pull
-          protocol: simplestreams
-          server: https://images.linuxcontainers.org
-          alias: ubuntu/22.04/cloud
-        wait_for_container: true
-        wait_for_ipv4_addresses: true
-        profiles:
-          - k8s-config
+      shell: |
+        lxc launch ubuntu:22.04 {{ control_plane }} -c security.privileged=true -c security.nesting=true -c linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
+        lxc file push /boot/config-5.15.0-94-generic  {{ control_plane }}/boot/
+        lxc restart {{ control_plane }}
 
-    - name: Create LXD container
-      lxd_container:
-        name: "{{ item }}"
-        ignore_volatile_options: true
-        state: started
-        source:
-          type: image
-          mode: pull
-          protocol: simplestreams
-          server: https://images.linuxcontainers.org
-          alias: ubuntu/22.04/cloud
-        wait_for_container: true
-        wait_for_ipv4_addresses: true
-        profiles:
-          - k8s-config
-        #target: "{{ item.node }}"
-      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
-    - name: Initiate cluster setup on controller (Must occur first)
-      shell:
-        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
-
-    - name: Initiate cluster setup on workers
-      shell:
-        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ item }} bash
+    - name: Create LXD container workers
+      shell: |
+        lxc launch ubuntu:22.04 {{ item }} -c security.privileged=true -c security.nesting=true -c linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
+        lxc file push /boot/config-5.15.0-94-generic  {{ item }}/boot/
+        lxc restart {{ item }}
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
     - name: Delete a file
