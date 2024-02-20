@@ -133,8 +133,8 @@
           alias: ubuntu/22.04/cloud
         wait_for_container: true
         wait_for_ipv4_addresses: true
-        profiles:
-          - k8s-config
+        # profiles:
+        #   - k8s-config
 
     - name: Create LXD container
       lxd_container:
@@ -149,8 +149,8 @@
           alias: ubuntu/22.04/cloud
         wait_for_container: true
         wait_for_ipv4_addresses: true
-        profiles:
-          - k8s-config
+        # profiles:
+        #   - k8s-config
         #target: "{{ item.node }}"
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
@@ -159,12 +159,16 @@
         lxc file push /boot/config-5.15.0-94-generic  {{ control_plane }}/boot/
         lxc config set {{ control_plane }} security.privileged true
         lxc config set {{ control_plane }} security.nesting true
+        lxc config set {{ control_plane }} linux.kernel_modules "ip_tables,ip6_tables,netlink_diag,nf_nat,overlay"
+        lxc exec {{ control_plane }} -- echo 'L /dev/kmsg - - - - /dev/null' > /etc/tmpfiles.d/kmsg.conf
 
     - name: Copy boot to LXC workers (Weird issue)
       shell: |
         lxc file push /boot/config-5.15.0-94-generic  {{ item }}/boot/
         lxc config set {{ item }} security.privileged true
         lxc config set {{ item }} security.nesting true
+        lxc config set {{ item }} linux.kernel_modules "ip_tables,ip6_tables,netlink_diag,nf_nat,overlay"
+        lxc exec {{ item }} -- echo 'L /dev/kmsg - - - - /dev/null' > /etc/tmpfiles.d/kmsg.conf
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
     - name: Restart controller

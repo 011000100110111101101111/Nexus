@@ -3,7 +3,7 @@ layout: about
 permalink: /about/
 title: A bit about me.
 tags: about
-headshot: /images/headshot.jpeg
+#headshot: /images/
 ---
 
 I currently live in Salem, MA which is a town fairly close to Boston. I'm currently enrolled at the University of Massachusetts Lowell, majoring in computer science with a focus on cybersecurity. I anticipate graduating this spring, and am excited to explore jobs in the DevOps / Cybersecurity world.
