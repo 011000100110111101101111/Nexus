@@ -42,8 +42,3 @@
         lxc file push /boot/config-5.15.0-94-generic  {{ item }}/boot/
         lxc restart {{ item }}
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
-    - name: Delete a file
-      file:
-        path: /tmp/kubernetes_setup_script.sh
-        state: absent
