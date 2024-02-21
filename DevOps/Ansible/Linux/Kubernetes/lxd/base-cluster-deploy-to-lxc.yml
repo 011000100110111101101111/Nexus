@@ -5,83 +5,31 @@
     control_plane: "kmaster"
     # Worker names, kworker-1 , kworker-2, kworker-3, ... kworker-{{ number_of_workers }}
     worker_prefix: "kworker"
-    number_of_workers: 3
+    number_of_workers: 1
   tasks:
-    - name: Create /etc/modules-load.d/k8s.conf for all worker nodes
-      copy:
-        content: |
-          overlay
-          br_netfilter
-        dest: /etc/modules-load.d/k8s.conf
-
-    - name: Load the modules
-      shell:
-        cmd: sudo modprobe overlay && sudo modprobe br_netfilter
-
-    - name: Configure kernel parameters for all nodes
-      copy:
-        content: |
-          net.bridge.bridge-nf-call-iptables  = 1
-          net.bridge.bridge-nf-call-ip6tables = 1
-          net.ipv4.ip_forward                 = 1
-        dest: /etc/sysctl.d/k8s.conf
-
-    - name: Apply the changes
-      shell:
-        cmd: sudo sysctl --system
-
-    - name: Create LXD container controller
-      shell: |
-        lxc launch ubuntu:22.04 {{ control_plane }} -c security.privileged=true -c security.nesting=true -c linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
-        lxc file push /boot/config-5.15.0-94-generic  {{ control_plane }}/boot/
-        lxc config set {{ control_plane }} security.privileged=true
-        lxc config set {{ control_plane }} security.nesting=true
-        lxc config set {{ control_plane }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
-
-    - name: Create LXD container workers
-      shell: |
-        lxc launch ubuntu:22.04 {{ item }} -c security.privileged=true -c security.nesting=true -c linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
-        lxc file push /boot/config-5.15.0-94-generic  {{ item }}/boot/
-      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
-    - name: Restart control plane to apply changes
-      shell: |
-        lxc config set {{ control_plane }} security.privileged=true
-        lxc config set {{ control_plane }} security.nesting=true
-        lxc config set {{ control_plane }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
-        lxc exec {{ control_plane }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf
-        overlay
-        br_netfilter
-        EOL'
-        lxc exec {{ control_plane }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/sysctl.d/k8s.conf
-        net.bridge.bridge-nf-call-iptables  = 1
-        net.bridge.bridge-nf-call-ip6tables = 1
-        net.ipv4.ip_forward                 = 1
-        EOL'
-        lxc exec {{ control_plane }} -- /bin/bash -c 'sudo sysctl --system'
-        lxc restart {{ control_plane }}
-
-    - name: Restart workers to apply changes
-      shell: |
-        lxc config set {{ item }} security.privileged=true
-        lxc config set {{ item }} security.nesting=true
-        lxc config set {{ item }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
-        lxc exec {{ item }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf
-        overlay
-        br_netfilter
-        EOL'
-        lxc exec {{ item }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/sysctl.d/k8s.conf
-        net.bridge.bridge-nf-call-iptables  = 1
-        net.bridge.bridge-nf-call-ip6tables = 1
-        net.ipv4.ip_forward                 = 1
-        EOL'
-        lxc restart {{ item }}
-      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
     - name: Copy over script
       copy:
         content: |
           #!/bin/bash
+          # Create /etc/modules-load.d/k8s.conf for all worker nodes
+          cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf
+          overlay
+          br_netfilter
+          EOL
+
+          # Load the modules
+          sudo modprobe overlay
+          sudo modprobe br_netfilter
+
+          # Configure kernel parameters for all nodes
+          cat <<EOL | sudo tee /etc/sysctl.d/k8s.conf
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+          EOL
+
+          # Apply the changes
+          sudo sysctl --system
           sudo apt-get update
           sudo install -m 0755 -d /etc/apt/keyrings
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -99,6 +47,46 @@
         dest: /tmp/kubernetes_setup_script.sh
         mode: "0755"
 
-    - name: Initiate cluster setup on controller (Must occur first)
-      shell:
-        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
+    - name: Set limits for default profile
+      shell: |
+        lxc profile set default limits.memory=2GB
+        lxc profile set default limits.cpu=1
+
+    - name: Create container on another node
+      lxd_container:
+        name: "{{ control_plane }}"
+        type: virtual-machine
+        state: started
+        ignore_volatile_options: true
+        wait_for_ipv4_addresses: true
+        profiles: ["default"]
+        source:
+          protocol: simplestreams
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/22.04/cloud
+        timeout: 600
+
+    - name: Create container on another node
+      lxd_container:
+        name: "{{ item }}"
+        type: virtual-machine
+        state: started
+        ignore_volatile_options: true
+        wait_for_ipv4_addresses: true
+        profiles: ["default"]
+        source:
+          protocol: simplestreams
+          type: image
+          mode: pull
+          server: https://images.linuxcontainers.org
+          alias: ubuntu/22.04/cloud
+        timeout: 600
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Copy script over and execute.
+      shell: |
+        lxc file push /tmp/kubernetes_setup_script.sh  {{ control_plane }}/root/
+        lxc exec {{ control_plane }} -- chmod +x /root/kubernetes_setup_script.sh
+        lxc exec {{ control_plane }} -- /root/kubernetes_setup_script.sh
