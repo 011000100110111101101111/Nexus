@@ -34,6 +34,9 @@
       shell: |
         lxc launch ubuntu:22.04 {{ control_plane }} -c security.privileged=true -c security.nesting=true -c linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
         lxc file push /boot/config-5.15.0-94-generic  {{ control_plane }}/boot/
+        lxc config set {{ control_plane }} security.privileged=true
+        lxc config set {{ control_plane }} security.nesting=true
+        lxc config set {{ control_plane }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
 
     - name: Create LXD container workers
       shell: |
@@ -43,6 +46,9 @@
 
     - name: Restart control plane to apply changes
       shell: |
+        lxc config set {{ control_plane }} security.privileged=true
+        lxc config set {{ control_plane }} security.nesting=true
+        lxc config set {{ control_plane }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
         lxc exec {{ control_plane }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf
         overlay
         br_netfilter
@@ -57,6 +63,9 @@
 
     - name: Restart workers to apply changes
       shell: |
+        lxc config set {{ item }} security.privileged=true
+        lxc config set {{ item }} security.nesting=true
+        lxc config set {{ item }} linux.kernel_modules=ip_tables,ip6_tables,netlink_diag,nf_nat,overlay
         lxc exec {{ item }} -- /bin/bash -c 'cat <<EOL | sudo tee /etc/modules-load.d/k8s.conf
         overlay
         br_netfilter
@@ -69,19 +78,27 @@
         lxc restart {{ item }}
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
-    - name: Restart to apply changes
-      shell: |
-        lxc exec {{ control_plane }} -- sudo apt-get update
-        lxc exec {{ control_plane }} -- sudo install -m 0755 -d /etc/apt/keyrings
-        lxc exec {{ control_plane }} -- curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
-        lxc exec {{ control_plane }} -- sudo chmod a+r /etc/apt/keyrings/docker.gpg
-        lxc exec {{ control_plane }} -- echo "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-        lxc exec {{ control_plane }} -- sudo apt-get update
-        lxc exec {{ control_plane }} -- sudo apt update && sudo apt install -y containerd.io
-        lxc exec {{ control_plane }} -- containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
-        lxc exec {{ control_plane }} -- sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
-        lxc exec {{ control_plane }} -- sudo systemctl restart containerd && sudo systemctl enable containerd
-        lxc exec {{ control_plane }} -- sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gpg
-        lxc exec {{ control_plane }} -- curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-        lxc exec {{ control_plane }} -- echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-        lxc exec {{ control_plane }} -- sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
+    - name: Copy over script
+      copy:
+        content: |
+          #!/bin/bash
+          sudo apt-get update
+          sudo install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo chmod a+r /etc/apt/keyrings/docker.gpg
+          echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          sudo apt update && sudo apt install -y containerd.io
+          containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+          sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+          sudo systemctl restart containerd && sudo systemctl enable containerd
+          sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gpg
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
+        dest: /tmp/kubernetes_setup_script.sh
+        mode: "0755"
+
+    - name: Initiate cluster setup on controller (Must occur first)
+      shell:
+        cmd: cat /tmp/kubernetes_setup_script.sh | lxc exec {{ control_plane }} bash
