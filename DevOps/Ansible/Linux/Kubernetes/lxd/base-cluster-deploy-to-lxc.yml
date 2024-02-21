@@ -5,8 +5,32 @@
     control_plane: "kmaster"
     # Worker names, kworker-1 , kworker-2, kworker-3, ... kworker-{{ number_of_workers }}
     worker_prefix: "kworker"
-    number_of_workers: 1
+    number_of_workers: 2
   tasks:
+    - name: Set limits for default profile
+      shell: |
+        lxc profile set default limits.memory=2GB
+        lxc profile set default limits.cpu=2
+
+    - name: Create worker vms
+      shell: |
+        lxc launch ubuntu:22.04 {{ item }} --vm --profile default
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Create worker vms
+      shell: |
+        lxc launch ubuntu:22.04 {{ control_plane }} --vm --profile default
+
+    - name: This adds delay to ensure IPS get assigned. If further tasks fail it is most likely due to this not waiting long enough.
+      # TODO: Make this better to grab IPs directly then do health check
+      # wait_for:
+      #   host: "{{ control_plane }}"
+      #   port: 22
+      #   delay: 10
+      #   timeout: 300
+      shell:
+        cmd: sleep 120
+
     - name: Copy over script
       copy:
         content: |
@@ -30,63 +54,59 @@
 
           # Apply the changes
           sudo sysctl --system
-          sudo apt-get update
+          sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gpg gnupg
           sudo install -m 0755 -d /etc/apt/keyrings
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg
           sudo chmod a+r /etc/apt/keyrings/docker.gpg
-          echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-          sudo apt-get update
-          sudo apt update && sudo apt install -y containerd.io
+          echo "deb [arch=\"$(dpkg --print-architecture)\" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo \"$VERSION_CODENAME\") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update && sudo apt-get install -y containerd.io
           containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
           sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
           sudo systemctl restart containerd && sudo systemctl enable containerd
-          sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gpg
           curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
           echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-          sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
+          sudo apt-get update && sudo apt-get install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
+
+          if [[ $(hostname) =~ .*master.* ]]
+          then
+
+            echo "[TASK 8] Initialize Kubernetes Cluster"
+            kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all >> /root/kubeinit.log 2>&1
+
+            echo "[TASK 9] Copy kube admin config to root user .kube directory"
+            mkdir /root/.kube
+            cp /etc/kubernetes/admin.conf /root/.kube/config
+
+            echo "[TASK 10] Deploy Calico network"
+            kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+          fi
         dest: /tmp/kubernetes_setup_script.sh
         mode: "0755"
 
-    - name: Set limits for default profile
-      shell: |
-        lxc profile set default limits.memory=2GB
-        lxc profile set default limits.cpu=1
-
-    - name: Create container on another node
-      lxd_container:
-        name: "{{ control_plane }}"
-        type: virtual-machine
-        state: started
-        ignore_volatile_options: true
-        wait_for_ipv4_addresses: true
-        profiles: ["default"]
-        source:
-          protocol: simplestreams
-          type: image
-          mode: pull
-          server: https://images.linuxcontainers.org
-          alias: ubuntu/22.04/cloud
-        timeout: 600
-
-    - name: Create container on another node
-      lxd_container:
-        name: "{{ item }}"
-        type: virtual-machine
-        state: started
-        ignore_volatile_options: true
-        wait_for_ipv4_addresses: true
-        profiles: ["default"]
-        source:
-          protocol: simplestreams
-          type: image
-          mode: pull
-          server: https://images.linuxcontainers.org
-          alias: ubuntu/22.04/cloud
-        timeout: 600
-      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
-    - name: Copy script over and execute.
+    - name: Execute on masters.
       shell: |
         lxc file push /tmp/kubernetes_setup_script.sh  {{ control_plane }}/root/
         lxc exec {{ control_plane }} -- chmod +x /root/kubernetes_setup_script.sh
         lxc exec {{ control_plane }} -- /root/kubernetes_setup_script.sh
+
+    - name: Execute on workers
+      shell: |
+        lxc file push /tmp/kubernetes_setup_script.sh  {{ item }}/root/
+        lxc exec {{ item }} -- chmod +x /root/kubernetes_setup_script.sh
+        lxc exec {{ item }} -- /root/kubernetes_setup_script.sh
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Delete a file
+      file:
+        path: /tmp/kubernetes_setup_script.sh
+        state: absent
+
+    - name: Generate and save cluster join command to /joincluster.sh
+      shell: |
+        lxc exec {{ control_plane }} -- /bin/bash -c 'kubeadm token create --print-join-command'
+      register: join_command_result
+
+    - name: Execute on workers
+      shell: |
+        lxc exec {{ item }} -- /bin/bash -c '{{ join_command_result.stdout }}'
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"

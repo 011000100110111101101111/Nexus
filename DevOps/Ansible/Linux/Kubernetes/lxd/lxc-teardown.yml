@@ -10,10 +10,10 @@
       lxd_container:
         name: "{{ control_plane }}"
         state: absent
-        type: container
+        type: virtual-machine
     - name: Delete LXD container workers
       lxd_container:
         name: "{{ item }}"
         state: absent
-        type: container
+        type: virtual-machine
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
