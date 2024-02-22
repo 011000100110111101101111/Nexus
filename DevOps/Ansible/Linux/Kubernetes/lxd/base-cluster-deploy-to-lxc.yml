@@ -29,7 +29,8 @@
       #   delay: 10
       #   timeout: 300
       shell:
-        cmd: sleep 120
+        # Give each machine 30 seconds to get IP (This happens sequentially)
+        cmd: sleep "{{ 30 * number_of_workers }}"
 
     - name: Copy over script
       copy:
