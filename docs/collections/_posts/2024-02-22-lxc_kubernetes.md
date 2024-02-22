@@ -14,7 +14,8 @@ categories: guides
 
 **Prerequisites**
 
-- Everything is done on Ubuntu 22.04 LTS server, however this should work on any system you have LXD running.
+- Everything is done on `Ubuntu 22.04 LTS server`, however this should work on any system you have LXD running.
+- Although the host does not need to be Ubuntu, the deployed VMS MUST be `Ubuntu:22.04` as this is what the script is tuned for. Feel free to change the script slightly to handle other operating systems.
 - You already deployed an LXC cluster. See my LXC guide first if you have not.
 
 ## Overview
@@ -25,8 +26,9 @@ Therefore, I shifted to deploying on LXC virtual machines, compared to LXC conta
 
 The script below will handle deploying the LXC vms for you and setting up kubeadm inside. You will end with a running cluster.
 
+{% raw %}
+
 ```yaml
----
 - hosts: all
   become: yes
   vars:
@@ -51,6 +53,7 @@ The script below will handle deploying the LXC vms for you and setting up kubead
         lxc launch ubuntu:22.04 {{ control_plane }} --vm --profile default
 
     - name: This adds delay to ensure IPS get assigned. If further tasks fail it is most likely due to this not waiting long enough.
+      # TODO: Make this better to grab IPs directly then do health check
       # wait_for:
       #   host: "{{ control_plane }}"
       #   port: 22
@@ -140,6 +143,7 @@ The script below will handle deploying the LXC vms for you and setting up kubead
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 ```
 
+{% endraw %}
 An example command to run this would be,
 
 ```bash
