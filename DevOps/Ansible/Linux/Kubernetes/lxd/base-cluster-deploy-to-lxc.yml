@@ -111,3 +111,24 @@
       shell: |
         lxc exec {{ item }} -- /bin/bash -c '{{ join_command_result.stdout }}'
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Get IPS of new running cluster
+      shell: |
+        echo "---\n{{ control_plane }} is reachable at";
+        lxc exec {{ control_plane }} -- ip a | awk '/inet / && $2 ~ /\/24/ && $2 !~ /^127\./ && $2 !~ /\/32/ {print $2}'
+      register: master_ip
+
+    - name: Get IPS of new running cluster
+      shell: |
+        echo "---\n{{ item }} is reachable at";
+        lxc exec {{ item }} -- ip a | awk '/inet / && $2 ~ /\/24/ && $2 !~ /^127\./ && $2 !~ /\/32/ {print $2}'
+      register: workerIPS
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
+
+    - name: Print output for control plane
+      debug:
+        var: master_ip.stdout_lines
+
+    - name: Print output for workers
+      debug:
+        var: workerIPS.stdout_lines
