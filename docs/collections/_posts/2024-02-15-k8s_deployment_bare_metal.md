@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes Bare Metal Deployment Guide
 date: 2024-02-15
 summary: Covers a manual bare metal deployment.
-categories: orchestration kubernetes
+categories: guides
 ---
 
 **Guide results**

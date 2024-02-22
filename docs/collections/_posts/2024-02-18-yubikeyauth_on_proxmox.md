@@ -3,7 +3,7 @@ layout: post
 title: Using Yubikey for 2FA with Proxmox
 date: 2024-02-16
 summary: Covers setting up yubikey as a 2fa method for proxmox
-categories: security
+categories: guides
 ---
 
 **Guide results**

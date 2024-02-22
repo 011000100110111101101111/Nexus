@@ -3,7 +3,7 @@ layout: post
 title: Microceph Cluster Deployment Guide
 date: 2024-02-16
 summary: Covers deploying and setting up microceph across multiple nodes allowing for HA storage
-categories: storage microceph
+categories: guides
 ---
 
 The microceph package makes setting up a cluster easier. It includes numerous dependencies required.

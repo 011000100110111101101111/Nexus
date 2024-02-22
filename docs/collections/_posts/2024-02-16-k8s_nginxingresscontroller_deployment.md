@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes NGINX Ingress Controller Guide
 date: 2024-02-16
 summary: Covers deploying and setting up nginx ingress controller to use for service ingress
-categories: orchestration kubernetes
+categories: guides
 ---
 
 **Guide results**

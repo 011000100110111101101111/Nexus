@@ -3,7 +3,7 @@ layout: post
 title: Using Terraform Provider with Proxmox
 date: 2024-02-16
 summary: Covers setting up the terraform provider for proxmox to automate virtual machine deployment.
-categories: ansible
+categories: guides
 ---
 
 **Guide results**

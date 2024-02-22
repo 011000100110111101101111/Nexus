@@ -3,7 +3,7 @@ layout: post
 title: Kubernetes Longhorn Deployment Guide
 date: 2024-02-16
 summary: Covers deploying and setting up longhorn via helm or manually
-categories: orchestration kubernetes
+categories: guides
 ---
 
 **Guide results**

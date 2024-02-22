@@ -3,7 +3,7 @@ layout: post
 title: Useful aliases for the command line
 date: 2024-02-16
 summary: Congregates numerous aliases I have created / adapted from others.
-categories: programming aliases
+categories: guides
 ---
 
 **Guide results**
