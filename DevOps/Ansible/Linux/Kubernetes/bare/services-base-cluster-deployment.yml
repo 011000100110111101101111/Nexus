@@ -14,26 +14,6 @@
         kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
       become: yes
       become_user: "{{ user }}"
-    # Below does not want to work
-    # - name: Add helm repo
-    #   kubernetes.core.helm_repository:
-    #     name: metallb
-    #     repo_url: https://metallb.github.io/metallb
-    # - name: Create metallb-system namespace
-    #   kubernetes.core.k8s:
-    #     definition:
-    #       apiVersion: v1
-    #       kind: Namespace
-    #       metadata:
-    #         name: metallb-system
-    #     state: present
-    # - name: Install metallb
-    #   kubernetes.core.helm:
-    #     name: my-metallb
-    #     chart_ref: metallb/metallb
-    #     namespace: metallb-system
-    #   become: yes
-    #   become_user: "{{ user }}"
     - name: Install metallb
       shell: |
         MBLVER=$(curl -s https://api.github.com/repos/metallb/metallb/releases/latest|grep tag_name|cut -d '"' -f 4)

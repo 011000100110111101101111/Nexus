@@ -5,12 +5,20 @@
     control_plane: "kmaster"
     # Worker names, kworker-1 , kworker-2, kworker-3, ... kworker-{{ number_of_workers }}
     worker_prefix: "kworker"
+    # VM resources (Per instance)
+    # Minimum 2 cpus and 2GB of memory
+    cpus: 2
+    memory: 2GB
+    # Number of workers to create
     number_of_workers: 2
+    # Public SSH Key to connect to the VMs (Pass auth is disabled)
+    # Add multiple with newlines
+    pub_ssh: "{{ lookup('onepassword', 'nexus-mobile', field='public key') }}\n{{ lookup('onepassword', 'nexus-command', field='public key') }}"
   tasks:
     - name: Set limits for default profile
       shell: |
-        lxc profile set default limits.memory=2GB
-        lxc profile set default limits.cpu=2
+        lxc profile set default limits.memory={{ memory }}GB
+        lxc profile set default limits.cpu={{ cpus }}
 
     - name: Create worker vms
       shell: |
@@ -67,7 +75,7 @@
           curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
           echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
           sudo apt-get update && sudo apt-get install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
-
+          echo -e "{{ pub_ssh }}" | sudo tee -a /root/.ssh/authorized_keys
           if [[ $(hostname) =~ .*master.* ]]
           then
 
@@ -89,12 +97,14 @@
         lxc file push /tmp/kubernetes_setup_script.sh  {{ control_plane }}/root/
         lxc exec {{ control_plane }} -- chmod +x /root/kubernetes_setup_script.sh
         lxc exec {{ control_plane }} -- /root/kubernetes_setup_script.sh
+        lxc exec {{ control_plane }} -- rm /root/kubernetes_setup_script.sh
 
     - name: Execute on workers
       shell: |
         lxc file push /tmp/kubernetes_setup_script.sh  {{ item }}/root/
         lxc exec {{ item }} -- chmod +x /root/kubernetes_setup_script.sh
         lxc exec {{ item }} -- /root/kubernetes_setup_script.sh
+        lxc exec {{ item }} -- rm /root/kubernetes_setup_script.sh
       loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
 
     - name: Delete a file
@@ -114,21 +124,9 @@
 
     - name: Get IPS of new running cluster
       shell: |
-        echo "---\n{{ control_plane }} is reachable at";
-        lxc exec {{ control_plane }} -- ip a | awk '/inet / && $2 ~ /\/24/ && $2 !~ /^127\./ && $2 !~ /\/32/ {print $2}'
-      register: master_ip
-
-    - name: Get IPS of new running cluster
-      shell: |
-        echo "---\n{{ item }} is reachable at";
-        lxc exec {{ item }} -- ip a | awk '/inet / && $2 ~ /\/24/ && $2 !~ /^127\./ && $2 !~ /\/32/ {print $2}'
-      register: workerIPS
-      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"
-
-    - name: Print output for control plane
-      debug:
-        var: master_ip.stdout_lines
+        lxc list
+      register: vmIPS
 
     - name: Print output for workers
       debug:
-        var: workerIPS.stdout_lines
+        var: vmIPS.stdout_lines
