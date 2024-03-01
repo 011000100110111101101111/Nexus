@@ -66,6 +66,7 @@
 
     - name: Backup /etc/hosts file (Incase we are updating, or there are existing entries.)
       shell: mv /etc/hosts /etc/hosts.bak
+      ignore_errors: true
 
     - name: Add initial entries to /etc/hosts
       copy:
@@ -141,7 +142,7 @@
 - hosts: masters
   become: yes # Run as root
   vars:
-    user: user
+    user: alex
 
   tasks:
     - name: Check if the master node is already initialized
@@ -196,6 +197,7 @@
         name: "DUMMY_HOST"
         JOIN_COMMAND: "{{ kubernetes_join_command.stdout_lines[0] }}"
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # TODO: Need to add the following to remove group readable from kubeconfig, chmod go-r ~/.kube/config
 
 # Ansible playbook to join the worker nodes to the cluster
 - hosts: workers

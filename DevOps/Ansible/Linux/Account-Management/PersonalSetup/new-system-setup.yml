@@ -27,6 +27,7 @@
       - zoxide
       - thefuck
       - fzf
+      - stow
     specific_package_list_ubuntu:
       - git
     specific_package_list_centos:
@@ -254,17 +255,19 @@
         - 'ln -s "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt/spaceship.zsh-theme" "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship.zsh-theme"'
       when: not stat_zsh_spaceship_prompt_result.stat.exists
 
-    - name: Creating new ~/.zshrc
-      copy:
-        src: ".zshrc"
-        dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
-        backup: "yes"
+    # - name: Creating new ~/.zshrc
+    #   copy:
+    #     src: ".zshrc"
+    #     dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
+    #     backup: "yes"
       #when: not stat_rc_result.stat.exists
+    - name: Cloning repo
+      command:
+        cmd: git clone https://github.com/011000100110111101101111/.dotfiles.git 
 
     - name: Set login shell of user {{ current_user_name | default(ansible_env.USER) }} to `/bin/zsh` with `usermod`
-      command:
-        cmd: usermod --shell /bin/zsh {{ current_user_name | default(ansible_env.USER) }}
-
+      shell: |
+        usermod --shell /bin/zsh {{ current_user_name | default(ansible_env.USER) }}
     #- name: Install Dependencies
 
   handlers:
