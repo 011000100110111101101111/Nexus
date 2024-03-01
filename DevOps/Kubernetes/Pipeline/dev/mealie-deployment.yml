@@ -4,7 +4,7 @@ metadata:
   name: mealie-deployment
   labels:
     lab: mealie
-  namespace: homelab
+  namespace: dev
 spec:
   replicas: 1
   selector:
@@ -64,43 +64,43 @@ spec:
     port: 9925
     protocol: TCP
     targetPort: 9000
-  type: ClusterIP
+  type: LoadBalancer
 
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: mealie-ui-ingress
-  namespace: homelab
-  annotations:
-    # If using certmanager
-    # Used to provide wildcard domain prefixs to base domain
-    kubernetes.io/tls-acme: "true"
-    # This is clusterissuer you set up with cert-manager
-    cert-manager.io/cluster-issuer: development-issuer
-    # Default
-    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    # I needed to add this for it to work
-    #nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: mealie.nexus-core.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: mealie-ui-service
-            port:
-              number: 9925
-  tls:
-    - hosts:
-      - mealie.nexus-core.dev
-      secretName: mealie-ingress-tls
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: mealie-ui-ingress
+#   namespace: homelab
+#   annotations:
+#     # If using certmanager
+#     # Used to provide wildcard domain prefixs to base domain
+#     kubernetes.io/tls-acme: "true"
+#     # This is clusterissuer you set up with cert-manager
+#     cert-manager.io/cluster-issuer: development-issuer
+#     # Default
+#     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+#     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#     # I needed to add this for it to work
+#     #nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: mealie.nexus-core.dev
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: mealie-ui-service
+#             port:
+#               number: 9925
+#   tls:
+#     - hosts:
+#       - mealie.nexus-core.dev
+#       secretName: mealie-ingress-tls
 
 ---
 
