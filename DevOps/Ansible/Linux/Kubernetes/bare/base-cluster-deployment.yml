@@ -3,11 +3,11 @@
   become: yes
   vars:
     start_index: 1
-    k8s_release_key_url: "https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key"
-    k8s_signed_by_url: "https://pkgs.k8s.io/core:/stable:/v1.28/deb/"
+    k8s_package_version: "v1.29"
+    k8s_release_key_url: "https://pkgs.k8s.io/core:/stable:/{{ k8s_package_version }}/deb/Release.key"
+    k8s_signed_by_url: "https://pkgs.k8s.io/core:/stable:/{{ k8s_package_version }}/deb/"
     k8s_apt_keyring_path: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
     k8s_sources_list_path: "/etc/apt/sources.list.d/kubernetes.list"
-    k8s_package_version: "1.28"
   tasks:
     - name: Install required tools
       apt:
@@ -112,11 +112,23 @@
         sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
         sudo systemctl restart containerd && sudo systemctl enable containerd
         sudo apt update && sudo apt install -y apt-transport-https ca-certificates curl gpg
-        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --yes --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-        echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
-        sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
 
-# - name: create the "{{ cluster_admin }}" user
+    - name: Install Kubernetes GPG key
+      shell: |
+        curl -fsSL {{ k8s_release_key_url }} | sudo gpg --yes --dearmor -o {{ k8s_apt_keyring_path }}
+      args:
+        executable: /bin/bash
+
+    - name: Add Kubernetes repository
+      apt_repository:
+        repo: deb [signed-by={{ k8s_apt_keyring_path }}] {{ k8s_signed_by_url }} /
+        state: present
+        filename: kubernetes.list
+
+    - name: Install and mark hold
+      shell: sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
+
+      # - name: create the "{{ cluster_admin }}" user
 #   user:
 #     name: "{{ cluster_admin }}"
 #     generate_ssh_key: true
@@ -143,7 +155,7 @@
   become: yes # Run as root
   vars:
     user: alex
-
+    calico_helm_chart_url: "https://docs.tigera.io/calico/charts"
   tasks:
     - name: Check if the master node is already initialized
       stat:
@@ -169,11 +181,42 @@
         group: "{{ user }}"
         mode: 0644
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    - name: Install calico CNI
-      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-      become: yes
-      become_user: "{{ user }}"
-      when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # - name: Add Calico Repo
+    #   kubernetes.core.helm_repository:
+    #     name: projectcalico
+    #     repo_url: "{{ calico_helm_chart_url }}"
+    #   become_user: "{{ user }}"
+    # - name: Install Calico
+    #   kubernetes.core.helm:
+    #     name: calico
+    #     namespace: tigera-operator
+    #     chart_ref: projectcalico/tigera-operator
+    #     create_namespace: true
+    #   become_user: "{{ user }}"
+    # - name: Prep Calico CNI
+    #   shell: |
+    #     kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
+    #     kubectl get configmap kube-proxy -n kube-system -o yaml | \
+    # - name: Install calico
+    #   command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/tigera-operator.yaml
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # - name: Load Buffer
+    #   command: sleep 30
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # - name: Install Calico
+    #   command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/custom-resources.yaml
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # - name: Install calico CNI
+    #   command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
     - name: Get the token for joining the worker nodes
       become: yes
       become_user: "{{ user }}"
@@ -184,20 +227,23 @@
       debug:
         var: kubernetes_join_command.stdout_lines
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    - name: Set strictARP for metallb
-      shell: |
-        kubectl get configmap kube-proxy -n kube-system -o yaml | \
-        sed -e "s/strictARP: false/strictARP: true/" | \
-        kubectl apply -f - -n kube-system
-      become: yes
-      become_user: "{{ user }}"
-      when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    # - name: Set strictARP for metallb
+    #   shell: |
+    #     kubectl get configmap kube-proxy -n kube-system -o yaml | \
+    #     sed -e "s/strictARP: false/strictARP: true/" | \
+    #     kubectl apply -f - -n kube-system
+    #   become: yes
+    #   become_user: "{{ user }}"
+    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
     - name: Create dummy host to store variable for node config
       add_host:
         name: "DUMMY_HOST"
         JOIN_COMMAND: "{{ kubernetes_join_command.stdout_lines[0] }}"
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # TODO: Need to add the following to remove group readable from kubeconfig, chmod go-r ~/.kube/config
+    - name: Change KubeConfig permissions
+      shell: chmod go-r /home/{{ user }}/.kube/config
+    - name: Install helm
+      shell: sudo snap install helm --classic
 
 # Ansible playbook to join the worker nodes to the cluster
 - hosts: workers

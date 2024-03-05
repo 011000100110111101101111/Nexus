@@ -22,6 +22,12 @@ Tutorial I am [following](https://cert-manager.io/docs/installation/helm/)
 
 ## Installation
 
+### Via Manual
+
+```bash
+CERTVER=$(curl -s https://api.github.com/repos/cert-manager/cert-manager/releases/latest|grep tag_name|cut -d '"' -f 4)
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/"${CERTVER}"/cert-manager.yaml
+```
 
 ### Via Helm
 
@@ -52,13 +58,13 @@ You can add other flags for the customization like, check the docs for more info
 --set prometheus.enabled=false   # Example: disabling prometheus using a Helm parameter
 --set webhook.timeoutSeconds=4   # Example: changing the webhook timeout using a Helm parameter
 ```
-### Setting up Issuer
+#### Setting up Issuer
 
 Now we must deploy an Issuer. By default, issuers are per single namespace, but you can do a cluster-wide one with ClusterIssuer.
 
 This is the point that things can be very, very different.
 
-#### Cloudflare
+##### Cloudflare
 
 Get your api token and create the following secret (Also in the yaml files in this folder)
 ```yaml

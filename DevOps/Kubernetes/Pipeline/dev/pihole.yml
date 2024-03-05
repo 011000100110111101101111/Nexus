@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-deployment
+  labels:
+    app: pihole
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        env:
+          - name: TZ
+            value: "US/Eastern"
+          - name: WEBPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: pihole-secret
+                key: password
+          - name: DNSMASQ_USER
+            value: root
+          - name: DNS1
+            value: 1.1.1.1
+        volumeMounts:
+        - name: etc
+          mountPath: "/etc/pihole"
+        - name: dnsmasq
+          mountPath: "/etc/dnsmasq.d"
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "250m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+      volumes:
+        - name: etc
+          persistentVolumeClaim:
+            claimName: pihole-etc-longhorn-claim
+        - name: dnsmasq
+          persistentVolumeClaim:
+            claimName: pihole-dnsmasq-longhorn-claim
+
+
+--- 
+# Use if using ingress and remove 80 from dns-service
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: pihole-ui-service
+#   labels:
+#     app: pihole
+#   namespace: homelab
+# spec:
+#   selector:
+#     app: pihole
+#   ports:
+#   - name: http
+#     port: 8000
+#     protocol: TCP
+#     targetPort: 80
+#
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: pihole-dns-service
+  labels:
+    app: pihole
+  namespace: dev
+  annotations:
+    tailscale.com/expose: "true"
+spec:
+  selector:
+    app: pihole
+  ports:
+  - name: dns-u
+    port: 53
+    protocol: UDP
+    targetPort: 53
+  - name: dns-t
+    port: 53
+    protocol: TCP
+    targetPort: 53
+  - name: mon
+    port: 67
+    protocol: UDP
+    targetPort: 67
+  - name: http
+    port: 8000
+    protocol: TCP
+    targetPort: 80
+  type: LoadBalancer
+
+---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: pihole-ingress
+#   namespace: homelab
+#   annotations:
+#     # If using certmanager
+#     # Used to provide wildcard domain prefixs to base domain
+#     kubernetes.io/tls-acme: "true"
+#     # This is clusterissuer you set up with cert-manager
+#     cert-manager.io/cluster-issuer: development-issuer
+#     # Default
+#     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+#     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#     # I needed to add this for it to work
+#     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#   - host: pihole.nexus-core.dev
+#     http:
+#       paths:
+#       - path: /admin
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: pihole-ui-service
+#             port:
+#               name: http
+#   tls:
+#     - hosts:
+#       - pihole.nexus-core.dev
+#       secretName: pihole-tls
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-etc-longhorn-claim
+  namespace: homelab
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pihole-dnsmasq-longhorn-claim
+  namespace: homelab
+spec:
+  storageClassName: longhorn
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
