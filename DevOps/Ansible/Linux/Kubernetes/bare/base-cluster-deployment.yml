@@ -128,28 +128,6 @@
     - name: Install and mark hold
       shell: sudo apt update && sudo apt install -y kubelet kubeadm kubectl && sudo apt-mark hold kubelet kubeadm kubectl
 
-      # - name: create the "{{ cluster_admin }}" user
-#   user:
-#     name: "{{ cluster_admin }}"
-#     generate_ssh_key: true
-#     ssh_key_type: "ed25519"
-#     groups: sudo
-#     state: present
-#     create_home: yes
-#     shell: /bin/bash
-
-# - name: allow "{{ cluster_admin }}"  to have passwordless sudo
-#   lineinfile:
-#     dest: /etc/sudoers
-#     line: '"{{ cluster_admin }}" ALL=(ALL) NOPASSWD: ALL'
-#     validate: "visudo -cf %s"
-# Setup isci for Longhorn
-# - name: Install iscsi and nfs-common
-#   apt:
-#     name: [ 'open-iscsi', 'nfs-common' ]
-#     state: present
-#     update_cache: yes
-
 # Ansible playbook to initialize the master node
 - hosts: masters
   become: yes # Run as root
@@ -181,42 +159,18 @@
         group: "{{ user }}"
         mode: 0644
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # - name: Add Calico Repo
-    #   kubernetes.core.helm_repository:
-    #     name: projectcalico
-    #     repo_url: "{{ calico_helm_chart_url }}"
-    #   become_user: "{{ user }}"
-    # - name: Install Calico
-    #   kubernetes.core.helm:
-    #     name: calico
-    #     namespace: tigera-operator
-    #     chart_ref: projectcalico/tigera-operator
-    #     create_namespace: true
-    #   become_user: "{{ user }}"
-    # - name: Prep Calico CNI
-    #   shell: |
-    #     kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
-    #     kubectl get configmap kube-proxy -n kube-system -o yaml | \
-    # - name: Install calico
-    #   command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/tigera-operator.yaml
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # - name: Load Buffer
-    #   command: sleep 30
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # - name: Install Calico
-    #   command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/custom-resources.yaml
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # - name: Install calico CNI
-    #   command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
+    - name: Add Calico Repo
+      kubernetes.core.helm_repository:
+        name: projectcalico
+        repo_url: "{{ calico_helm_chart_url }}"
+      become_user: "{{ user }}"
+    - name: Install Calico
+      kubernetes.core.helm:
+        name: calico
+        namespace: tigera-operator
+        chart_ref: projectcalico/tigera-operator
+        create_namespace: true
+      become_user: "{{ user }}"
     - name: Get the token for joining the worker nodes
       become: yes
       become_user: "{{ user }}"
@@ -227,14 +181,6 @@
       debug:
         var: kubernetes_join_command.stdout_lines
       when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
-    # - name: Set strictARP for metallb
-    #   shell: |
-    #     kubectl get configmap kube-proxy -n kube-system -o yaml | \
-    #     sed -e "s/strictARP: false/strictARP: true/" | \
-    #     kubectl apply -f - -n kube-system
-    #   become: yes
-    #   become_user: "{{ user }}"
-    #   when: kubeadm_init.stat.exists == false # Only run if the master node is not already initialized
     - name: Create dummy host to store variable for node config
       add_host:
         name: "DUMMY_HOST"
