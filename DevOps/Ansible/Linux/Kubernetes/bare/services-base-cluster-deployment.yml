@@ -5,7 +5,6 @@
   vars:
     metallb_helm_chart_url: https://metallb.github.io/metallb
     longhorn_helm_chart_url: https://charts.longhorn.io
-    calico_helm_chart_url: https://docs.tigera.io/calico/charts
     nginx_helm_chart_url: https://kubernetes.github.io/ingress-nginx
     metallbstart: "10.35.40.80"
     metallbend: "10.35.40.99"
@@ -49,8 +48,6 @@
           ipAddressPools:
           - first-pool
         EOF
-    # - name: Rolling restart of metallb pods
-    #   command: kubectl rollout restart deployment controller -n metallb-system
     - name: Add Longhorn Repo
       kubernetes.core.helm_repository:
         name: longhorn
