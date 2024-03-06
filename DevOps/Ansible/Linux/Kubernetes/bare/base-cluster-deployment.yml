@@ -148,9 +148,11 @@
 - hosts: masters
   become: yes # Run as root
   vars:
-    user: alex
+    user: user
     calico_helm_chart_url: "https://docs.tigera.io/calico/charts"
   tasks:
+    - name: Install helm
+      shell: snap install helm --classic
     - name: Check if the master node is already initialized
       stat:
         path: /etc/kubernetes/admin.conf

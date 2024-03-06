@@ -1,0 +1,19 @@
+- hosts: masters
+  vars_files:
+    - ../config.vars
+  become: yes # Run as root
+  # Make sure to change this
+  become_user: "{{ become_user_setting }}"
+  tasks:    
+    - name: Add Certmanager Repo
+      kubernetes.core.helm_repository:
+        name: jetstack
+        repo_url: "{{ certmanager_helm_chart_url }}"
+    - name: Install Certmanager
+      kubernetes.core.helm:
+        name: cert-manager
+        namespace: cert-manager
+        chart_ref: jetstack/cert-manager
+        create_namespace: true
+        set_values:
+          - value: installCRDs=true

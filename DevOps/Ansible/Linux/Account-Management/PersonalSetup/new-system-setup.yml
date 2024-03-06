@@ -12,7 +12,7 @@
 
   # Global vars, change here
   vars:
-    current_user_name: "alex"
+    current_user_name: "user"
     ssh_password_authentication: "no"
     ssh_permit_empty_passwords: "no"
     ssh_use_pam: "yes"
@@ -207,10 +207,10 @@
 
     ### SHELL SETUP (OHMYZSH)
 
-    # - name: Check if .zshrc exists
-    #   stat:
-    #     path: /home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc
-    #   register: stat_rc_result
+    - name: Check if .zshrc exists
+      stat:
+        path: /home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc
+      register: stat_rc_result
 
     - name: Check if .oh-my-zsh exists
       stat:
@@ -255,12 +255,12 @@
         - 'ln -s "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship-prompt/spaceship.zsh-theme" "/home/{{ current_user_name | default(ansible_env.USER) }}/.oh-my-zsh/themes/spaceship.zsh-theme"'
       when: not stat_zsh_spaceship_prompt_result.stat.exists
 
-    # - name: Creating new ~/.zshrc
-    #   copy:
-    #     src: ".zshrc"
-    #     dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
-    #     backup: "yes"
-      #when: not stat_rc_result.stat.exists
+    - name: Creating new ~/.zshrc
+      copy:
+        src: ".zshrc"
+        dest: "/home/{{ current_user_name | default(ansible_env.USER) }}/.zshrc"
+        backup: "yes"
+      when: not stat_rc_result.stat.exists
     - name: Cloning repo
       command:
         cmd: git clone https://github.com/011000100110111101101111/.dotfiles.git 

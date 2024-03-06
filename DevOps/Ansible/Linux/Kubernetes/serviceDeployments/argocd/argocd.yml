@@ -1,0 +1,17 @@
+- hosts: masters
+  vars_files:
+    - ../config.vars
+  become: yes # Run as root
+  # Make sure to change this
+  become_user: "{{ become_user_setting }}"
+  tasks:    
+    - name: Add Longhorn Repo
+      kubernetes.core.helm_repository:
+        name: longhorn
+        repo_url: "{{ longhorn_helm_chart_url }}"
+    - name: Install Longhorn
+      kubernetes.core.helm:
+        name: longhorn
+        namespace: longhorn-system
+        chart_ref: longhorn/longhorn
+        create_namespace: true
