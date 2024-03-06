@@ -78,8 +78,8 @@ metadata:
   labels:
     app: pihole
   namespace: homelab
-  annotations:
-    tailscale.com/expose: "true"
+  # annotations:
+  #   tailscale.com/expose: "true"
 spec:
   selector:
     app: pihole
