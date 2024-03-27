@@ -12,7 +12,7 @@ spec:
     helm:
       releaseName: postgresql-ha
       valueFiles:
-        - values.yml
+        - ./values.yml
   destination:
     server: "https://kubernetes.default.svc"
     namespace: dev
