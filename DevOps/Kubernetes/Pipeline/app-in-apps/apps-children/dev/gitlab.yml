@@ -12,9 +12,9 @@ spec:
     helm:
       releaseName: gitlab
       valuesObject:
-        upgradeCheck:
-          enabled: false
         global:
+          upgradeCheck:
+            enabled: false
           ingress:
             configureCertmanager: false
             class: nginx
