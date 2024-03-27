@@ -12,7 +12,17 @@ spec:
     helm:
       releaseName: postgresql-ha
       # valueFiles:
-      #   - ./values.yml
+      #   - postgresql-values.yml
+      valuesObject:
+        # This is not exposed go away hackers
+        pgpool:
+          adminPassword: password123
+        postgresql:
+          password: password123
+          replicaCount: 3
+          repmgrPassword: password123
+        volumePermissions:
+          enabled: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: dev
