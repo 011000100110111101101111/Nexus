@@ -109,7 +109,7 @@ metadata:
     # Used to provide wildcard domain prefixs to base domain
     kubernetes.io/tls-acme: "true"
     # This is clusterissuer you set up with cert-manager
-    cert-manager.io/cluster-issuer: development-issuer
+    cert-manager.io/cluster-issuer: homelab-issuer
     # Default
     #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     #nginx.ingress.kubernetes.io/ssl-passthrough: "true"

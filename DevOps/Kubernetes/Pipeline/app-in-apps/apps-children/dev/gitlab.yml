@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+spec:
+  project: appbundle-project-dev
+  source:
+    chart: gitlab
+    repoURL: https://charts.gitlab.io/
+    #targetRevision: 14.0.0
+    helm:
+      releaseName: gitlab
+      valuesObject:
+        global:
+          ingress:
+            configureCertmanager: false
+            class: nginx
+            annotations:
+              kubernetes.io/tls-acme: true
+              cert-manager.io/cluster-issuer: homelab-issuer
+              nginx.ingress.kubernetes.io/ssl-redirect: true
+              nginx.ingress.kubernetes.io/force-ssl-redirect: true
+              kubernetes.io/ingress.allow-http: false
+            tls:
+              enabled: true
+          psql:
+            host: gitlab-rw
+            password:
+              secret:
+                gitlab-app
+              key:
+                password
+          hosts:
+            domain: gitlab.nexus-core.dev
+            https: true
+        gitlab:
+          webservice:
+            ingress:
+              tls:
+                secretName: temp-gitlab-tls
+          kas:
+            ingress:
+              tls:
+                secretName: temp-kas-tls
+        registry:
+          ingress:
+            tls:
+              secretName: temp-registry-tls
+        minio:
+          ingress:
+            tls:
+              secretName: temp-minio-tls
+        certmanager:
+          install: false
+        nginx-ingress:
+          enabled: false
+        prometheus:
+          install: false
+        postgresql:
+          install: false
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: dev
