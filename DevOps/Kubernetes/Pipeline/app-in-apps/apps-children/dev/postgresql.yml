@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: postgresql
+  name: postgresql-ha
   namespace: argocd
 spec:
   project: appbundle-project-dev
   source:
-    chart: bitnami/postgresql-ha
+    chart: postgresql-ha
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: 14.0.0
     helm:
-      releaseName: postgres
+      releaseName: postgresql-ha
       valueFiles:
         - values.yml
   destination:
