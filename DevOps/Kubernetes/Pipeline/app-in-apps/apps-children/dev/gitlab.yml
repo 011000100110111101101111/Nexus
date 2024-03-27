@@ -8,7 +8,7 @@ spec:
   source:
     chart: gitlab
     repoURL: https://charts.gitlab.io/
-    #targetRevision: 14.0.0
+    targetRevision: 7.10.0
     helm:
       releaseName: gitlab
       valuesObject:
