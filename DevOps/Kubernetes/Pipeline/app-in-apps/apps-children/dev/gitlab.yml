@@ -12,6 +12,8 @@ spec:
     helm:
       releaseName: gitlab
       valuesObject:
+        upgradeCheck:
+          enabled: false
         global:
           ingress:
             configureCertmanager: false
