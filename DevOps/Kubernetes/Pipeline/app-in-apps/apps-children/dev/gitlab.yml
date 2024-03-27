@@ -13,8 +13,6 @@ spec:
       releaseName: gitlab
       valuesObject:
         global:
-          upgradeCheck:
-            enabled: false
           ingress:
             configureCertmanager: false
             class: nginx
@@ -37,6 +35,8 @@ spec:
             domain: gitlab.nexus-core.dev
             https: true
         gitlab:
+          upgradeCheck:
+            enabled: false
           webservice:
             ingress:
               tls:
