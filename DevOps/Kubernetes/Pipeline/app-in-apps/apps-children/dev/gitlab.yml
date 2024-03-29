@@ -34,9 +34,9 @@ spec:
           hosts:
             domain: gitlab.nexus-core.dev
             https: true
-        gitlab:
-          upgradeCheck:
+        upgradeCheck:
             enabled: false
+        gitlab:
           webservice:
             ingress:
               tls:
