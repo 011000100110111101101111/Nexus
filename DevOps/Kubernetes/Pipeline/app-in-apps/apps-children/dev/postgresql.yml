@@ -15,6 +15,11 @@ spec:
       #   - postgresql-values.yml
       valuesObject:
         # This is not exposed go away hackers
+        # Attempting gitlab integration fix
+        # This should allow local dns resolution
+        slave:
+          service:
+            clusterIP: None
         pgpool:
           adminPassword: password123
         postgresql:
