@@ -25,7 +25,8 @@ spec:
             tls:
               enabled: true
           psql:
-            host: postgresql-ha-postgresql
+            # Hopefully fixes connection issues
+            host: postgresql-ha-postgresql-headless
             username: postgres
             password:
               useSecret: true
