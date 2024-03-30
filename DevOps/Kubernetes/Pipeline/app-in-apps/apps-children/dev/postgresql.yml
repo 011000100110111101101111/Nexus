@@ -18,8 +18,9 @@ spec:
         pgpool:
           adminPassword: password123
         postgresql:
-          database: gitlabhq_production
+          username: postgres
           password: password123
+          database: gitlabhq_production
           replicaCount: 3
           repmgrPassword: password123
         volumePermissions:

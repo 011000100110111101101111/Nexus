@@ -26,13 +26,13 @@ spec:
               enabled: true
           psql:
             host: postgresql-ha-postgresql
+            username: postgres
             password:
-              secret:
-                gitlab-app
-              key:
-                password
+              useSecret: true
+              secret: gitlab-app
+              key: password
           hosts:
-            domain: gitlab.nexus-core.dev
+            domain: nexus-core.dev
             https: true
         upgradeCheck:
             enabled: false
