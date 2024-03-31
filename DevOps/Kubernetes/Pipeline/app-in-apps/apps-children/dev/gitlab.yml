@@ -26,12 +26,16 @@ spec:
               enabled: true
           psql:
             # Hopefully fixes connection issues
-            host: postgresql-ha-postgresql-headless
+            # host
+            # might need to use serviceName since its a kubernetes service
+            serviceName: postgresql-ha-postgresql-headless
             username: postgres
-            password:
-              useSecret: true
-              secret: gitlab-app
-              key: password
+            password: password123
+            port: 5432
+            # password:
+            #   useSecret: true
+            #   secret: gitlab-app
+            #   key: password
           hosts:
             domain: nexus-core.dev
             https: true
