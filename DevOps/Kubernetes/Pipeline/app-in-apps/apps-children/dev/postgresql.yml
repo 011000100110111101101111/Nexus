@@ -21,13 +21,16 @@ spec:
         #   service:
         #     clusterIP: None
         pgpool:
-          adminPassword: password123
+          customUsers:
+            usernames: "gitlab"
+            passwords: "password123"
+          adminUsername: "gitlab"
+          adminPassword: "password123"
         postgresql:
-          username: gitlab
-          password: password123
-          database: gitlabhq_production
-          replicaCount: 3
-          repmgrPassword: password123
+          username: "gitlab"
+          password: "password123"
+          postgresPassword: "password123"
+          database: "gitlabhq_production"
         volumePermissions:
           enabled: true
   destination:
