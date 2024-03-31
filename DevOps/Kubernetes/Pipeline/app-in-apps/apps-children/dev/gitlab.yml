@@ -30,12 +30,12 @@ spec:
             # might need to use serviceName since its a kubernetes service
             serviceName: postgresql-ha-postgresql-headless
             username: postgres
-            password: password123
+            #password: password123
             port: 5432
-            # password:
-            #   useSecret: true
-            #   secret: gitlab-app
-            #   key: password
+            password:
+              useSecret: true
+              secret: gitlab-app
+              key: password
           hosts:
             domain: nexus-core.dev
             https: true
