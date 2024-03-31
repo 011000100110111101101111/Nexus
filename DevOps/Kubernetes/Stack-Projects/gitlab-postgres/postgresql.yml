@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql-ha
+  namespace: argocd
+spec:
+  project: appbundle-project-dev
+  source:
+    chart: postgresql-ha
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 14.0.0
+    helm:
+      releaseName: postgresql-ha
+      # valueFiles:
+      #   - postgresql-values.yml
+      valuesObject:
+        # This is not exposed go away hackers
+        # Attempting gitlab integration fix
+        # This should allow local dns resolution
+        # slave:
+        #   service:
+        #     clusterIP: None
+        pgpool:
+          customUsers:
+            usernames: "gitlab"
+            passwords: "password123"
+          adminUsername: "gitlab"
+          adminPassword: "password123"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
+          replicaCount: 2
+          reservedConnections: 0
+        postgresql:
+          username: "gitlab"
+          password: "password123"
+          postgresPassword: "password123"
+          database: "gitlabhq_production"
+        volumePermissions:
+          enabled: true
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: dev

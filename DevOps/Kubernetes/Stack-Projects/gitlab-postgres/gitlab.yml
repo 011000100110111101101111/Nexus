@@ -1,0 +1,29 @@
+# TODO: Figure out which credentials gitlab uses..
+pgpool:
+  customUsers:
+    usernames: "gitlab"
+    passwords: "password123"
+  adminUsername: "gitlab"
+  adminPassword: "password123"
+  resources:
+    # Equal to their "small" instance resource wise
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+  # Gitlab had issues with overloading the database with consecutive
+  # connections, this sets up two replicas to handle the load
+  # as well as a reserved connection pool of 0
+  # which removes cap to the number of connections
+  replicaCount: 2
+  reservedConnections: 0
+# These are the credentials you will supply to gitlab
+postgresql:
+  username: "gitlab"
+  password: "password123"
+  postgresPassword: "password123"
+  database: "gitlabhq_production"
+volumePermissions:
+  enabled: true
