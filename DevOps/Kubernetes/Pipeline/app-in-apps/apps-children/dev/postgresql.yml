@@ -23,7 +23,7 @@ spec:
         pgpool:
           adminPassword: password123
         postgresql:
-          username: postgres
+          username: gitlab
           password: password123
           database: gitlabhq_production
           replicaCount: 3

@@ -29,7 +29,7 @@ spec:
             # host
             # might need to use serviceName since its a kubernetes service
             serviceName: postgresql-ha-postgresql-headless
-            username: postgres
+            username: gitlab
             #password: password123
             port: 5432
             password:
