@@ -42,6 +42,11 @@ spec:
         upgradeCheck:
             enabled: false
         gitlab:
+          gitaly:
+            persistence:
+              enabled: true
+              storageClass: longhorn
+              size: 10Gi
           webservice:
             ingress:
               tls:
