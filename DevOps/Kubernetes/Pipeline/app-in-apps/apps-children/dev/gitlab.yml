@@ -28,7 +28,7 @@ spec:
             # Hopefully fixes connection issues
             # host
             # might need to use serviceName since its a kubernetes service
-            serviceName: postgresql-ha-postgresql-headless
+            serviceName: postgresql-ha
             username: gitlab
             #password: password123
             port: 5432
