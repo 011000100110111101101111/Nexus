@@ -26,6 +26,15 @@ spec:
             passwords: "password123"
           adminUsername: "gitlab"
           adminPassword: "password123"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 750m
+              memory: 768Mi
+          replicaCount: 2
+          reservedConnections: 0
         postgresql:
           username: "gitlab"
           password: "password123"
