@@ -1,0 +1,47 @@
+- hosts: masters
+  vars_files:
+    - ../helm-config.yml
+    - ../automated-config.yml
+  become: yes # Run as root
+  # Make sure to change this
+  become_user: "{{ become_user_setting }}"
+  tasks:
+    - name: Add Metallb Repo
+      kubernetes.core.helm_repository:
+        name: metallb
+        repo_url: "{{ metallb_helm_chart_url }}"
+    - name: Prep Metallb
+      shell: 'kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system'
+    - name: Install Metallb
+      kubernetes.core.helm:
+        name: my-metallb
+        namespace: metallb-system
+        chart_ref: metallb/metallb
+        create_namespace: true
+    - name: Pause for deployment
+      pause:
+        minutes: 1
+    - name: Configure metallb IP address pool
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: IPAddressPool
+        metadata:
+          name: first-pool
+          namespace: metallb-system
+        spec:
+          addresses:
+          - {{ metallbstart }}-{{ metallbend }}
+        EOF
+    - name: Configure metallb L2Advertisement
+      shell: |
+        kubectl apply -f - <<EOF
+        apiVersion: metallb.io/v1beta1
+        kind: L2Advertisement
+        metadata:
+          name: metallb-l2-advertisement
+          namespace: metallb-system
+        spec:
+          ipAddressPools:
+          - first-pool
+        EOF

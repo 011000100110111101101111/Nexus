@@ -1,0 +1,18 @@
+- hosts: all
+  become: yes
+  vars_files:
+    - ../helm-config.yml
+    - ../automated-config.yml
+  gather_facts: false
+  tasks:
+    - name: Delete LXD container controller
+      lxd_container:
+        name: "{{ control_plane }}"
+        state: absent
+        type: virtual-machine
+    - name: Delete LXD container workers
+      lxd_container:
+        name: "{{ item }}"
+        state: absent
+        type: virtual-machine
+      loop: "{{ range(1, number_of_workers|int + 1) | map('string') | map('regex_replace', '^', worker_prefix) | map('join', '') | list }}"

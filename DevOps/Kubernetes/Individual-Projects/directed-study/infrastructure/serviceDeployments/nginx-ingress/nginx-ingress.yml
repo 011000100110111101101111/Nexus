@@ -1,0 +1,21 @@
+- hosts: masters
+  vars_files:
+    - ../helm-config.yml
+    - ../automated-config.yml
+  become: yes # Run as root
+  # Make sure to change this
+  become_user: "{{ become_user_setting }}"
+  tasks:
+    - name: Add NGINX Ingress Repo
+      kubernetes.core.helm_repository:
+        name: ingress-nginx
+        repo_url: "{{ nginx_helm_chart_url }}"
+    - name: Install NGINX Ingress
+      kubernetes.core.helm:
+        name: ingress-nginx
+        namespace: ingress-nginx
+        chart_ref: ingress-nginx/ingress-nginx
+        create_namespace: true
+    - name: Pause for deployment
+      pause:
+        minutes: 1
