@@ -1,0 +1,15 @@
+:root {
+  --grey: #393E41;
+  --black: #1E2019;
+  --void: #050505;
+  --void-fade: rgba(5, 5, 5, 0.8);
+  --cream: #D3D0CB;
+  --cream-fade: rgba(211, 208, 203, 0.7);
+  --honeymustard: #E2C044;
+  --nord-blue: #587B7F;
+  --salmon: #F97068;
+  --sky: #57C4E5;
+  --white: #F4F4F9;
+}
+
+

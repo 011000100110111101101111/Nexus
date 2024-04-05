@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jumpbox-deployment
+  labels:
+    app: jumpbox
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: jumpbox
+  template:
+    metadata:
+      labels:
+        app: jumpbox
+    spec:
+      containers:
+      - name: jumpbox
+        image: temptest011/jumpbox:latest
+        command:
+          - "sh"
+          - "-c"
+          - "while true; do sleep 6000; done"
+        resources:
+          limits:
+            memory: "64Mi"
+            cpu: "128m"
+          requests:
+            memory: "32Mi"
+            cpu: "64m"
+        volumeMounts:
+          - name: sshd-config
+            mountPath: /config
+          - name: sshd-config
+            mountPath: /etc/ssh/sshd_config
+            subPath: sshd_config
+          - name: ssh-data
+            mountPath: /etc/ssh
+      volumes:
+        - name: sshd-config
+          configMap:
+            name: jumpbox-config
+            defaultMode: 0440
+        - name: ssh-data
+          emptyDir: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jumpbox-service
+  namespace: vpn
+  annotations:
+    tailscale.com/expose: "true"
+spec:
+  selector:
+    app: jumpbox
+  ports:
+    - name: ssh
+      protocol: TCP
+      port: 22
+      targetPort: 22
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jumpbox-config
+  namespace: vpn
+data:
+  authorized_keys: |
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINs8KbefMC7eYXEXL2sQPKJ4gkh/+hB6vzuNISw5zgFn
+  sshd_config: |
+    Port 22
+    AuthorizedKeysFile /config/authorized_keys
+    PermitRootLogin no
+    PubkeyAuthentication yes
+    PasswordAuthentication no
+    PermitEmptyPasswords no
+    KbdInteractiveAuthentication no
+    UsePAM yes
+    X11Forwarding yes
+    PrintMotd no
+    AcceptEnv LANG LC_*
+    Subsystem sftp /usr/lib/openssh/sftp-server

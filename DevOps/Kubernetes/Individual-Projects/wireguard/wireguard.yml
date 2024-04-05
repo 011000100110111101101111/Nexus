@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:  wireguard
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # annotations:
+  #   meta.helm.sh/release-name: wireguard
+  labels:
+    app: wireguard
+  name: wireguard
+  namespace: wireguard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wireguard
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      containers:
+        - name: wireguard
+          image: linuxserver/wireguard
+          imagePullPolicy: IfNotPresent
+          command:
+            - "sh"
+            - "-c"
+            - ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}'); sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg0.conf; chmod 400 /config/wg0.conf
+            - sysctl -w net.ipv4.ip_forward=1
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "US/Eastern"
+            #- name: SERVERURL
+            #  value: "wireguard.example.com"
+            - name: SERVERPORT
+              value: "51820"
+            - name: PEERS
+              value: user1,user2
+            - name: PEERDNS
+              value: "auto"
+          ports:
+            - containerPort: 51820
+              name: wireguard
+              protocol: UDP
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME"]
+            privileged: true
+          volumeMounts:
+            - mountPath: /config
+              name: wireguard-config
+            - mountPath: /etc/wireguard-secret
+              name: wireguard-secret
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+      - name: wireguard-config
+        emptyDir: {}
+      - name: wireguard-secret
+        secret:
+          secretName: wireguard-secret
+          items:
+            - key: wg0.conf.template
+              path: wg0.conf.template
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wireguard-service
+  namespace: wireguard
+  labels:
+    app: wireguard
+spec:
+  selector:
+    app: wireguard
+  ports:
+    - protocol: UDP
+      port: 51820
+      targetPort: 51820
+  type: LoadBalancer

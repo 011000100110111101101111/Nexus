@@ -7,3 +7,4 @@ hosts.ini
 *credentials.pkr.hcl
 .terraform
 *.lock.hcl
+.vscode/settings.json
