@@ -2,7 +2,7 @@ title: Nexus
 author: Alex Sheehan
 description: "Always learning"
 baseurl: ""
-url: "https://www.nexus-core.dev"
+url: ""
 date_format: "%b %-d, %Y"
 
 # Github Build Settings
