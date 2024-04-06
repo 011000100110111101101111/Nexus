@@ -4,9 +4,21 @@ description: "Always learning"
 baseurl: ""
 url: "https://www.nexus-core.dev"
 date_format: "%b %-d, %Y"
-source: source
 
-# Pagination
+# Github Build Settings
+lsi: false
+safe: true
+source: source
+incremental: false
+highlighter: rouge
+gist:
+  noscript: false
+kramdown:
+  math_engine: mathjax
+  syntax_highlighter: rouge
+redcarpet:
+  extensions: ["smart", "tables", "with_toc_data", "footnotes"]
+permalink: pretty
 paginate: 7
 paginate_path: "/blog/:num/"
 plugins:
@@ -14,6 +26,8 @@ plugins:
   - jekyll-sitemap
 # https://github.com/jekyll/jekyll/issues/2938
 exclude: [vendor]
+sass:
+  compressed: true
 
 text:
   pagination:
