@@ -1,8 +1,8 @@
 title: Nexus
 author: Alex Sheehan
 description: "Always learning"
-baseurl: ""
-url: ""
+baseurl: "/docs"
+url: "https://011000100110111101101111.github.io/Nexus"
 date_format: "%b %-d, %Y"
 
 # Github Build Settings
