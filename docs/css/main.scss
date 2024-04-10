@@ -1,0 +1,15 @@
+---
+# The scss file which include files from _sass/
+---
+@charset "UTF-8";
+
+/*!
+* Testing theme
+*/
+
+
+@import "variables";
+@import "base";
+@import "header";
+@import "footer";
+@import "content";

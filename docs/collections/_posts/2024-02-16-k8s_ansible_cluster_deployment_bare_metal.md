@@ -6,14 +6,14 @@ summary: Covers two ansible playbooks used to automatically deploy kubernetes cl
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
 - 1 master node running on ubuntu
 - x worker nodes running on ubuntu
 - CNI deployed
 - Ability to add any amount of other services into script (CSI, ingress, etc)
 
-**Prerequisites / Important Information**
+## Prerequisites / Important Information
 
 - Everything is tested and tuned for Ubuntu 22.04 LTS server
   - If you want to use another os, there are various areas you will need to alter, but it is easily doable.

@@ -5,42 +5,15 @@ layout: default
 {% assign minutes = content | strip_html | number_of_words | divided_by: 180 %}
 {% if minutes == 0 %} {% assign minutes = 1 %} {% endif %}
 
-<style>
-  p a {
-    color: black !important;
-    text-decoration: none;
-    border-bottom: 0.0625em solid #dcf3ff;
-    box-shadow: 0 -0.4em 0 #dcf3ff inset;
-  }
 
-  p a:hover,
-  p a:active,
-  p a:focus {
-    border-color: #aedbf9;
-    box-shadow: 0 -0.75em 0 #aedbf9 inset;
-  }
-
-  p .reversefootnote {
-    border: none;
-    box-shadow: none;
-  }
-
-  p .reversefootnote:hover,
-  p .reversefootnote:active,
-  p .reversefootnote:focus {
-    border-color: none;
-    box-shadow: none;
-  }
-</style>
-
-<div class="post-header mb2">
+<div class="post-header">
   <h1>{{ page.title }}</h1>
-  <span class="post-meta">{{ page.date | date: site.date_format }}</span><br />
+  <span class="post-header-date">{{ page.date | date: site.date_format }}</span><br />
   {% if page.update_date %}
-  <span class="post-meta">{{ site.text.post.updated }}: {{ page.update_date | date: site.date_format
+  <span class="post-header-info">{{ site.text.post.updated }}: {{ page.update_date | date: site.date_format
     }}</span><br />
   {% endif %}
-  <span class="post-meta small">
+  <span class="post-header-readtime">
     {% if page.minutes %} {{ page.minutes }} {{ site.text.post.minute_read }} {%
     else %} {{ minutes }} {{ site.text.post.minute_read }} {% endif %}
   </span>

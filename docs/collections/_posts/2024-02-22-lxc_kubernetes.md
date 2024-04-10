@@ -6,13 +6,13 @@ summary: Covers deploying a Kubernetes cluster to an existing LXC cluster via an
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
-- `N` LXC containers deployed
+- X LXC containers deployed
 - Kubernetes cluster deployed across those `N` containers
 - Single control plane.
 
-**Prerequisites**
+## Prerequisites
 
 - Everything is done on `Ubuntu 22.04 LTS server`, however this should work on any system you have LXD running.
 - Although the host does not need to be Ubuntu, the deployed VMS MUST be `Ubuntu:22.04` as this is what the script is tuned for. Feel free to change the script slightly to handle other operating systems.

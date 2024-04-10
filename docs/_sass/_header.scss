@@ -1,0 +1,26 @@
+header {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  background-color: $header-bg-color;
+  z-index: 20;
+  padding: 1em;
+  width: 100%;
+  a {
+    text-decoration: none;
+    color: black;
+  }
+  a.logo {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  ul {
+    display: flex;
+    list-style-type: none;
+    justify-content: space-around;
+    width: 100%;
+  }
+  li a {
+    padding: 1em;
+  }
+}
