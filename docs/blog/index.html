@@ -1,16 +1,15 @@
 ---
-layout: default
+layout: post
 tags: blog
 ---
 
 {% assign posts_count = site.posts | size %}
 
-<div class="blog-page">
+<div class="blog-page-wrapper">
   <h1>Blog</h1>
 
-  <div class="blog-posts-container">
+  <div class="blog-content-wrapper">
     {% if posts_count > 0 %}
-    <div class="blog-redundant">
       {% for post in paginator.posts %}
       <div class="blog-post">
         <p class="blog-post-date">
@@ -24,7 +23,6 @@ tags: blog
           {% if post.summary %} {{ post.summary }} {% else %} {{ post.excerpt }}
           {% endif %}
         </p>
-      </div>
       {% endfor %}
     </div>
     {% include pagination.html %} {% if site.show_subscribe_cta %} {% include

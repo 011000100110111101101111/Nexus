@@ -1,8 +1,8 @@
 body {
-  display: none;
+  // display: none;
 }
 
-.wrapper {
+.default-wrapper {
   display: grid;
   grid-template-columns: auto;
   height: 100vh;
@@ -95,7 +95,7 @@ body {
 
 @media only screen and (min-width: 1020px) {
 
-  .wrapper {
+  .default-wrapper {
     grid-template-columns: 70% auto;
     grid-template-rows: 100% auto;
     grid-template-areas:
