@@ -53,7 +53,7 @@ body {
     }
   }
 
-  section.welcome, section.subscribe {
+  section.welcome {
     font-size: .9rem;
     line-height: 1.4rem;
   }
@@ -75,32 +75,14 @@ body {
       color: $white;
     }
 
-    h2 {
+    h1 {
       color: $white;
+      font-size: 2rem;
     }
 
 
   }
 
-  section.subscribe {
-
-    background-color: $subscribe-bg-color;
-
-    input {
-      width: calc(100% - 2em);
-      padding: 1em;
-      font-family: 'Montserrat';
-      margin-bottom: 1em;
-    }
-
-    button {
-      width: calc(100% - 2em);
-      background: $submit-btn-bg-color;
-      color: $submit-btn-color;
-      padding: 1em;
-      border: none;
-    }
-  }
 }
 
 
@@ -115,21 +97,28 @@ body {
 
   .wrapper {
     grid-template-columns: 70% auto;
-    grid-template-rows: 60% auto;
+    grid-template-rows: 100% auto;
     grid-template-areas:
       "left-welcome welcome"
-      "left-welcome subscribe";
+      "left-welcome welcome";
     height: 100vh;
-  }
-
-  .left-welcome {
-    grid-area: left-welcome;
   }
 
   section {
     display: grid;
     align-items: center;
+  }
 
+  section.left-welcome {
+    grid-area: left-welcome;
+  }
+
+  section.welcome {
+    div.socials {
+      a {
+        padding: 0 1em 0 0;
+      }
+    }
   }
 }
 
