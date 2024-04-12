@@ -18,7 +18,7 @@ categories: guides
 - Although the host does not need to be Ubuntu, the deployed VMS MUST be `Ubuntu:22.04` as this is what the script is tuned for. Feel free to change the script slightly to handle other operating systems.
 - You already deployed an LXC cluster. See my LXC guide first if you have not.
 
-## Overview
+## Begin
 
 There was some extreme difficulties getting the cluster to deploy into simple containers, with unexplainable errors that made it very difficult to troubleshoot. The modules were loaded correctly, the privileges were set, and everything else listed was done but it would work 50% of the time, which is not reliable enough.
 

@@ -6,19 +6,23 @@ summary: Covers a manual bare metal deployment.
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
 - 1 master node running on ubuntu
 - 2 worker nodes running on ubuntu
 - CNI deployed
 
-**Prerequisites / Important Information**
+## Prerequisites
 
 - Everything is tested and tuned for Ubuntu 22.04 LTS server
   - If you want to use another os, there are various areas you will need to alter, but it is easily doable.
 - We will discuss the deployment of kubernetes on bare metal machines. We will look into the considerations needed when using bare metal compared to cloud, as well as discussing the benefits of certain "plugins" compared to others. All of this comes from my research during implementing k8s in my homelab, as well as in the CCDC.
 - To be more specific, I will cover deploying [Kubeadm](https://kubernetes.io/docs/reference/setup-tools/kubeadm/) across 1 master node and 2 worker nodes. First, we will cover the manual steps required, then look at an ansible playbook to take care of these manual steps instead.
 - Throughout this writeup I will switch between referencing the control plane and master. They are interchangable, but if you are just starting then control plane is the most recent used reference for it.
+
+## Begin
+
+Before you can deploy the cluster, there are a bunch of commands you will need to run through to ensure the OS is capable of supporting cluster functionality.
 
 ## Pre-Installation Requirements
 

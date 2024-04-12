@@ -6,22 +6,22 @@ summary: Covers setting up yubikey as a 2fa method for proxmox
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
-- Be able to use yubikey as 2FA auth for proxmox
+Be able to use yubikey as 2FA auth for proxmox
 
-**Prerequisites**
+## Prerequisites
 
 - Have a proxmox machine running
 - Have atleast 1 yubikey
 
----
+## Begin
 
 First, go to [yubikeys getapikey site](upgrade.yubico.com/getapikey/).
 
 Put in your email and then press your yubikey for the YubiKey OTP field. This will allow you to use the yubikey web services for authentication and link it to your yubikey.
 
-**Keep the ID and Key open for the following steps**
+### Keep the ID and Key open for the following steps
 
 Now, go back to your proxmox UI and make sure you click on the `Datacenter` level, not the node level. Then, go to the following `Permissions -> Realms`. Now, double click the pam entry, and change `Require TFA` to `Yubico`, you will be asked for the ID and Key from the previous step so enter them here. You dont need anything for the URL, you can press enter.
 

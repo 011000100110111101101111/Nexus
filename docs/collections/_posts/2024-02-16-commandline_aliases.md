@@ -6,15 +6,15 @@ summary: Congregates numerous aliases I have created / adapted from others.
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
 - Learn some useful aliases.
 
-**Prerequisites / Important Information**
+## Prerequisites
 
 - None
 
----
+## Begin
 
 This is where I will collect aliases I find useful for different purposes. I will try my best to credit others when I have found it somewhere. This will also constantly be updated as I find / create more.
 

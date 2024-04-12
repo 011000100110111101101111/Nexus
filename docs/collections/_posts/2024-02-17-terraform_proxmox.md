@@ -6,13 +6,15 @@ summary: Covers setting up the terraform provider for proxmox to automate virtua
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
-- Be able to deploy virtual machines to proxmox server via terraform
+Be able to deploy virtual machines to proxmox server via terraform.
 
-**Prerequisites**
+## Prerequisites
 
-- Have a proxmox machine running
+Have a proxmox machine running.
+
+## Begin
 
 First we need to install terraform. See [here](https://developer.hashicorp.com/terraform/install) for operating system dependent steps. Here is how you can do it on `ubuntu/debian`.
 
@@ -80,8 +82,6 @@ proxmox_api_url = "https://MachineIP/api2/json"
 proxmox_api_token_id = "yourTokenID"
 proxmox_api_token_secret = "yourToken"
 ```
-
-**Ensure you .gitignore this if you have it in source**
 
 Finally, we can initiate the project with terraform, (Ensure you are in the same directory)
 

@@ -6,18 +6,16 @@ summary: Covers deploying and setting up microceph across multiple nodes allowin
 categories: guides
 ---
 
-The microceph package makes setting up a cluster easier. It includes numerous dependencies required.
+## Guide results
 
-**Guide results**
+A Ceph cluster deployed across 3 nodes allowing simple HA storage.
 
-- ceph cluster deployed across 3 nodes allowing simple HA storage
-
-**Prerequisites / Important Information**
+## Prerequisites
 
 - Everything is done on Ubuntu 22.04 LTS server.
 - You must have atleast 3 nodes.
 
-## Cluster Deployment
+## Begin
 
 Install microceph on all the nodes you want to run it on.
 

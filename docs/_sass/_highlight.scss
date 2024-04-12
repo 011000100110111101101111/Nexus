@@ -7,19 +7,31 @@
  */
 
  .highlight pre, pre {
-  background-color: #f8f8f8;
+  background-color: $cream;
   border: 1px solid #ccc;
-  padding: 6px 10px;
-  border-radius: 3px;
-  white-space: pre-wrap;
+  padding: 1em 1em;
+  // border-radius: 3em;
+  // white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+div.highlight {
+  pre {
+    code {
+      font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New;
+      span {
+        font-size: .8rem;
+      }
+    }
+  }
 }
 
 .highlight {
   .hll {
-    background-color: #f8f8f8;
+    background-color: $white;
     border: 1px solid #ccc;
-    padding: 6px 10px;
-    border-radius: 3px;
+    padding: 2em 4em;
+    border-radius: 1em;
   }
   .c {
     color: #999988;
@@ -168,5 +180,13 @@
   .gc {
     color: #999;
     background-color: #EAF2F5;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .highlight pre, pre {
+    background-color: $cream;
+    border-radius: 1em 1em 0em 0em;
+    padding: 1em 0em;
   }
 }

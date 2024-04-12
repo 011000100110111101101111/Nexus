@@ -6,18 +6,18 @@ summary: Covers deploying and setting up nginx ingress controller to use for ser
 categories: guides
 ---
 
-**Guide results**
+## Guide results
 
 - Ability to add ingress for pods.
   - Instead of using an IP for reaching a service, we can use domain names.
 
-**Prerequisites / Important Information**
+## Prerequisites
 
 - Everything is done on Ubuntu 22.04 LTS server.
 - I will be using helm to install this, if you havent installed helm go [here](https://helm.sh/docs/intro/install/)
 - There are two sources to install this, kubernetes community and nginx offical site. I prefer the community and have found the most success with it.
 
-## Installation
+## Begin
 
 Instead of using an IP for reaching a service, lets set up an ingress controller so we can use domain names.
 
@@ -124,8 +124,8 @@ Finally,
 
 Go to wherever your CA is (Mine is cloudflare) and do the following.
 
-- For more detail, you want to create an A record with your domain name (www.example.com) and have it point to the external IP.
-- Then you can create a CNAME wild card (name would be \*) and have it point to your domain name which will point any subdomains to www.example.com.
+- For more detail, you want to create an A record with your domain name (<www.example.com>) and have it point to the external IP.
+- Then you can create a CNAME wild card (name would be \*) and have it point to your domain name which will point any subdomains to <www.example.com>.
 
 To test it, you can do the following which is sourced from part 4 [here](https://cert-manager.io/docs/tutorials/acme/nginx-ingress/)
 
@@ -137,7 +137,7 @@ Test Service
 
     kubectl apply -f https://raw.githubusercontent.com/cert-manager/website/master/content/docs/tutorials/acme/example/service.yaml
 
-Test Ingress, change the hosts values to your DNS name you redirected to earlier (www.example.com)
+Test Ingress, change the hosts values to your DNS name you redirected to earlier (<www.example.com>)
 
     kubectl create --edit -f https://raw.githubusercontent.com/cert-manager/website/master/content/docs/tutorials/acme/example/ingress.yaml
 
