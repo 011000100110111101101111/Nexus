@@ -34,9 +34,18 @@
     ul {
       padding: .5em 2em .5em 1em;
       width: 100%;
+      li {
+        margin: .2em 0em .2em 0em;
+        a {
+          text-decoration: underline;
+          color: black;
+        }
+      }
     }
     p {
-      line-height: 1.2em;
+      line-height: 1.4rem;
+      margin: .4em 0em .4em 0em;
+      text-align: justify;
     }
     div.highlight {
       overflow-x: auto;
@@ -44,6 +53,10 @@
       margin: 1em 0em 1em 0em;
     }
   }
+}
+
+hr {
+  margin: 2em 0em 2em 0em;
 }
 
 @media screen and (min-width: 768px) {

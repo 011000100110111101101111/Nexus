@@ -1,0 +1,7 @@
+package*
+*.jpg
+*.png
+img*
+node*
+dist
+.parcel*

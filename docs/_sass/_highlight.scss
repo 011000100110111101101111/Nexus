@@ -182,11 +182,3 @@ div.highlight {
     background-color: #EAF2F5;
   }
 }
-
-@media screen and (max-width: 768px) {
-  .highlight pre, pre {
-    background-color: $cream;
-    border-radius: 1em 1em 0em 0em;
-    padding: 1em 0em;
-  }
-}

@@ -8,7 +8,8 @@ hosts.ini
 .terraform
 *.lock.hcl
 .vscode/settings.json
-
+.vscode
+.DS_Store
 # Jekyll
 .bundle
 .jekyll-cache/
