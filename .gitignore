@@ -10,6 +10,9 @@ hosts.ini
 .vscode/settings.json
 .vscode
 .DS_Store
+
+# Getting too big
+
 # Jekyll
 .bundle
 .jekyll-cache/

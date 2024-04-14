@@ -7,10 +7,8 @@ tags: blog
 
 <div class="blog-page-wrapper">
   <h1>Blog</h1>
-
-  <div class="blog-content-wrapper">
-    {% if posts_count > 0 %}
-      {% for post in paginator.posts %}
+  <div class="blog-cards">
+    {% for post in paginator.posts %}
       <div class="blog-post">
         <p class="blog-post-date">
           <span>{{ post.date | date: site.date_format }}</span>
@@ -23,11 +21,7 @@ tags: blog
           {% if post.summary %} {{ post.summary }} {% else %} {{ post.excerpt }}
           {% endif %}
         </p>
-      {% endfor %}
-    </div>
-    {% include pagination.html %} {% if site.show_subscribe_cta %} {% include
-    subscribe.html %} {% endif %} {% else %}
-    <h1 class="center">{{ site.text.index.coming_soon }}</h1>
-    {% endif %}
+      </div>
+    {% endfor %}
   </div>
 </div>

@@ -1,60 +1,44 @@
+
+
 .blog-page-wrapper {
   display: flex;
   flex-direction: column;
-  margin: 5em 5em 2em 5em;
-  padding: 1em;
-
+  margin: $wrapper-margin;
+  padding: $wrapper-padding;
+  background-color: $background-color;
+  height: 100%;
+  transition: 0.3s ease all;
   h1 {
     font-size: 2rem;
-    margin: 1em 0em 1em 0em;
+    padding: $card-padding;
   }
-}
-
-.blog-content-wrapper {
-}
-
-.blog-post {
-  .blog-post-date {
-    font-size: 1rem;
-    margin-bottom: .5em;
-    color: $grey;
-    font-style: italic;
-    padding-top: 1em;
-  }
-  .blog-post-summary {
-    border-bottom: 1px solid $grey;
-    padding-bottom: 1em;
-  }
-  a {
-    text-decoration: none;
-    color: $black;
-    font-weight: bold;
-    h3 {
-      margin-bottom: .5em;
-    }
-  }
-}
-
-.blog-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1em;
-  .blog-pagination-rightarrow-container, .blog-pagination-leftarrow-container {
-    a {
-      text-decoration: none;
-      color: $black;
-      font-weight: bold;
-      padding: 0em 1em 0em 1em;
-      img {
-        width: 1.5em;
-        height: 1.5em;
+  .blog-cards {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    .blog-post {
+      padding: $card-padding;
+      border-radius: $cardborder-radius;
+      background-color: $white-color;
+      margin: 1em;
+      box-shadow: $box-shadow;
+      a {
+        text-decoration: underline;
+        color: $black;
+        font-weight: bold;
+      }
+      .blog-post-date {
+        color: $infodark-color;
+        margin-bottom: .4em;
+      }
+      .blog-post-summary {
+        margin-top: .4em;
       }
     }
+    .blog-post:hover {
+      box-shadow: none;
+    }
   }
 }
-
-
 
 @media screen and (min-width: 768px) {
   html {
@@ -64,28 +48,34 @@
 
 @media only screen and (min-width: 1020px) {
   html {
-    font-size: 22px;
+    font-size: 20px;
   }
   .blog-page-wrapper {
-    margin: 2em 10em 2em 10em;
+    .blog-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 }
 
 
 @media only screen and (min-width: 1800px) {
   html {
-    font-size: 24px;
+    font-size: 22px;
   }
   .blog-page-wrapper {
-    margin: 2em 15em 2em 15em;
+    .blog-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 }
 
 @media only screen and (min-width: 2300px) {
   html {
-    font-size: 26px;
+    font-size: 24px;
   }
   .blog-page-wrapper {
-    margin: 2em 20em 2em 20em;
+    .blog-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 }
