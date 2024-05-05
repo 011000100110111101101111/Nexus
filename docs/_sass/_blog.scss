@@ -11,10 +11,12 @@
   h1 {
     font-size: 2rem;
     padding: $card-padding;
+    border-bottom: 1px solid $light-color;
   }
   .blog-cards {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
+    margin-top: 1em;
     .blog-post {
       padding: $card-padding;
       border-radius: $cardborder-radius;

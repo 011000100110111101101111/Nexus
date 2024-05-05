@@ -8,7 +8,7 @@ categories: guides
 
 ## Guide results
 
-- X LXC containers deployed
+- N LXC containers deployed
 - Kubernetes cluster deployed across those `N` containers
 - Single control plane.
 

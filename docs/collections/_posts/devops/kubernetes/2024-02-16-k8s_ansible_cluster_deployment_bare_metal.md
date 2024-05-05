@@ -9,7 +9,7 @@ categories: guides
 ## Guide results
 
 - 1 master node running on ubuntu
-- x worker nodes running on ubuntu
+- N worker nodes running on ubuntu
 - CNI deployed
 - Ability to add any amount of other services into script (CSI, ingress, etc)
 
