@@ -10,6 +10,7 @@ hosts.ini
 .vscode/settings.json
 .vscode
 .DS_Store
+.ds_store
 
 # Getting too big
 
