@@ -3,7 +3,7 @@
   become: yes
   vars:
     start_index: 1
-    k8s_package_version: "v1.29"
+    k8s_package_version: "v1.30"
     k8s_release_key_url: "https://pkgs.k8s.io/core:/stable:/{{ k8s_package_version }}/deb/Release.key"
     k8s_signed_by_url: "https://pkgs.k8s.io/core:/stable:/{{ k8s_package_version }}/deb/"
     k8s_apt_keyring_path: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
@@ -63,9 +63,9 @@
         sysctl_set: yes
         state: present
       with_items:
-        - { key: 'net.bridge.bridge-nf-call-iptables', value: '1' }
-        - { key: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
-        - { key: 'net.ipv4.ip_forward', value: '1' }
+        - { key: "net.bridge.bridge-nf-call-iptables", value: "1" }
+        - { key: "net.bridge.bridge-nf-call-ip6tables", value: "1" }
+        - { key: "net.ipv4.ip_forward", value: "1" }
 
     - name: Apply the changes
       shell: sudo sysctl --system
